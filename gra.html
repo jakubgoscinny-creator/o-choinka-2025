@@ -187,6 +187,16 @@ const NUM_LEVELS = 6;
 const LEVEL_TIMES = Array.from({length: NUM_LEVELS}, (_,i) => SONG_DUR * (i+1) / NUM_LEVELS);
 // [30.9, 61.9, 92.8, 123.8, 154.7, 185.6]
 
+// Difficulty per level — level 1 very easy, gradual ramp
+const LEVEL_CONFIG = [
+  { baseSpeed: 1.5, randSpeed: 0.5, maxOrbs: 1, interval: 105 }, // L1 — easy
+  { baseSpeed: 1.9, randSpeed: 0.6, maxOrbs: 2, interval: 90  }, // L2
+  { baseSpeed: 2.4, randSpeed: 0.7, maxOrbs: 2, interval: 76  }, // L3
+  { baseSpeed: 2.9, randSpeed: 0.8, maxOrbs: 3, interval: 64  }, // L4
+  { baseSpeed: 3.4, randSpeed: 0.9, maxOrbs: 3, interval: 54  }, // L5
+  { baseSpeed: 4.0, randSpeed: 1.0, maxOrbs: 4, interval: 46  }, // L6 — hard
+];
+
 const STATS = [
   {
     icon: '🎄', num: '720+',
@@ -232,9 +242,11 @@ let nextStatIdx = 0; // which stat to show next
 
 // ── gameplay vars ────────────────────────────────────────────
 let score = 0, lives = 3, catchTotal = 0;
-let orbs = [], spawnTick = 0, spawnInterval = 90;
+let orbs = [], spawnTick = 0;
 let sparkles = [], confetti = [];
 let levelNum = 0; // current level (0-5)
+let highScore = parseInt(localStorage.getItem('choinka_hs') || '0');
+let isNewRecord = false;
 
 // ── tree slots ───────────────────────────────────────────────
 const TCX = 210;
@@ -332,10 +344,11 @@ function inBox(p,b) { return p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h; }
 
 // button hit-boxes (virtual coords)
 const BTN = {
-  start:  {x:110, y:570, w:200, h:58},
-  donate: {x:60,  y:540, w:300, h:58},
-  again:  {x:110, y:615, w:200, h:44},
-  retry:  {x:110, y:500, w:200, h:58},
+  start:   {x:110, y:570, w:200, h:58},
+  donate:  {x:60,  y:540, w:300, h:58},
+  again:   {x:110, y:615, w:200, h:44},
+  retry:   {x:20,  y:548, w:182, h:56}, // lose screen — left
+  donate2: {x:218, y:548, w:182, h:56}, // lose screen — right
 };
 
 function handleTap(p) {
@@ -344,7 +357,10 @@ function handleTap(p) {
     if(inBox(p,BTN.donate)) donate$.classList.add('on');
     if(inBox(p,BTN.again))  resetGame();
   }
-  if(state===S.LOSE)  { if(inBox(p,BTN.retry))  resetGame(); }
+  if(state===S.LOSE)  {
+    if(inBox(p,BTN.retry))   resetGame();
+    if(inBox(p,BTN.donate2)) donate$.classList.add('on');
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -354,7 +370,7 @@ function beginGame() {
   state=S.PLAY; score=0; lives=3; catchTotal=0;
   orbs=[]; spawnTick=0; sparkles=[]; confetti=[];
   SLOTS.forEach(s=>s.color=null);
-  PLR.x=VW/2; levelNum=0; nextStatIdx=0;
+  PLR.x=VW/2; levelNum=0; nextStatIdx=0; isNewRecord=false;
   statCard={visible:false,idx:-1,timer:0,phase:'in'};
   startMusic();
 }
@@ -780,11 +796,10 @@ function drawPlay() {
     }
   }
 
-  // spawn
+  // spawn — use per-level config
   spawnTick++;
-  const lvlFactor = levelNum;
-  const interval = Math.max(22, 80 - lvlFactor*10);
-  if(spawnTick >= interval){ spawnOrb(lvlFactor); spawnTick=0; }
+  const cfg = LEVEL_CONFIG[Math.min(levelNum, LEVEL_CONFIG.length-1)];
+  if(spawnTick >= cfg.interval){ spawnOrb(); spawnTick=0; }
 
   // move player
   if(touchX !== null){
@@ -806,7 +821,18 @@ function drawPlay() {
       catchTotal++;
       return false;
     }
-    if(o.y>VH+30){ lives--; if(lives<=0) state=S.LOSE; return false; }
+    if(o.y>VH+30){
+      lives--;
+      if(lives<=0){
+        if(catchTotal > highScore){
+          highScore=catchTotal;
+          localStorage.setItem('choinka_hs',String(catchTotal));
+          isNewRecord=true;
+        }
+        state=S.LOSE;
+      }
+      return false;
+    }
     return true;
   });
 
@@ -817,14 +843,14 @@ function drawPlay() {
   tickStatCard();
 }
 
-function spawnOrb(lvl=0) {
-  const maxOnScreen = 2 + Math.floor(lvl/2);
-  if(orbs.length >= maxOnScreen) return;
+function spawnOrb() {
+  const cfg = LEVEL_CONFIG[Math.min(levelNum, LEVEL_CONFIG.length-1)];
+  if(orbs.length >= cfg.maxOrbs) return;
   orbs.push({
     x: 30+Math.random()*(VW-60),
     y: -28,
     r: 16+Math.random()*9,
-    speed: 2.2+lvl*.45+Math.random()*1.2,
+    speed: cfg.baseSpeed + Math.random()*cfg.randSpeed,
     color: ORB_COLORS[Math.floor(Math.random()*ORB_COLORS.length)],
     type:  ORB_TYPES [Math.floor(Math.random()*ORB_TYPES.length)],
     ang: Math.random()*Math.PI*2,
@@ -866,24 +892,51 @@ function drawWin() {
 function drawLose() {
   drawBG(); drawSnow(); drawTree(false); drawLights();
 
-  ctx.fillStyle='rgba(18,4,4,.9)';
-  ctx.beginPath(); rr(28,VH*.4,VW-56,VH*.45,18); ctx.fill();
-  ctx.strokeStyle='#c41e3a'; ctx.lineWidth=2; ctx.stroke();
+  // card
+  const cy = VH*.33;
+  ctx.fillStyle='rgba(8,4,18,.92)';
+  ctx.beginPath(); rr(24,cy,VW-48,VH*.56,18); ctx.fill();
+  ctx.strokeStyle='rgba(200,140,0,.6)'; ctx.lineWidth=1.5; ctx.stroke();
 
-  ctx.font=`bold 36px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='#e63946'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillText('❄️ Ojej!',VW/2,VH*.4+54);
+  // level badge
+  const lvlReached = Math.min(levelNum+1, NUM_LEVELS);
+  ctx.font=`bold 14px 'IM Fell English',Georgia,serif`;
+  ctx.fillStyle='rgba(255,215,0,.6)'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText(`POZIOM ${lvlReached} z 6`, VW/2, cy+28);
 
+  // headline
+  ctx.font=`bold 30px 'IM Fell English',Georgia,serif`;
+  ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd70077'; ctx.shadowBlur=14;
+  ctx.fillText(`Dotarłeś do`, VW/2, cy+64); ctx.shadowBlur=0;
+  ctx.font=`bold 38px 'Cinzel Decorative',serif`;
+  ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=18;
+  ctx.fillText(`Poziomu ${lvlReached}!`, VW/2, cy+106); ctx.shadowBlur=0;
+
+  // ornament count
   ctx.font=`italic 16px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='#f0e6c8';
-  ctx.fillText('Ozdoby spadły na ziemię...',VW/2,VH*.4+88);
+  ctx.fillStyle='rgba(240,230,200,.88)';
+  ctx.fillText(`Złapałeś ${catchTotal} ozdób 🎁`, VW/2, cy+140);
 
+  // record
+  if(isNewRecord && catchTotal > 0){
+    ctx.font=`bold 15px 'IM Fell English',Georgia,serif`;
+    ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=10;
+    ctx.fillText(`🏆 Nowy rekord! ${catchTotal} ozdób`, VW/2, cy+172); ctx.shadowBlur=0;
+  } else if(highScore > 0){
+    ctx.font=`13px 'IM Fell English',Georgia,serif`;
+    ctx.fillStyle='rgba(200,190,150,.7)';
+    ctx.fillText(`Twój rekord: ${highScore} ozdób`, VW/2, cy+172);
+  }
+
+  // motivation
   ctx.font=`13px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(210,200,170,.85)';
-  ctx.fillText(`Zebrałeś ${catchTotal} ozdób.`,VW/2,VH*.4+118);
-  ctx.fillText('Ale dzieci nadal czekają! 💪',VW/2,VH*.4+140);
+  ctx.fillStyle='rgba(180,170,140,.75)';
+  ctx.fillText('Dzieci nadal czekają na choinki 💪', VW/2, cy+200);
+  ctx.fillText('Pobij rekord albo wesprzyj akcję!', VW/2, cy+220);
 
-  drawBtn(BTN.retry,'🔄 Spróbuj Znowu');
+  // two buttons
+  drawBtn(BTN.retry,   '🔄 Pobij rekord');
+  drawBtn(BTN.donate2, '💛 Wesprzyj akcję', true);
 }
 
 // ══════════════════════════════════════════════════════════
