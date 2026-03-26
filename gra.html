@@ -162,10 +162,51 @@ function toVirtual(clientX, clientY) {
 // ── music ───────────────────────────────────────────────────
 music.volume = 0.55;
 let musicGoing = false;
+
+// ── Web Audio beat detection ─────────────────────────────────
+let audioCtx = null, analyser = null, beatData = null;
+let lastBeatTime = 0, beatPulse = 0, bassAvg = 80;
+const BEAT_COOLDOWN = 280; // ms — min gap between spawns (~214 BPM max)
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = audioCtx.createMediaElementSource(music);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    analyser.smoothingTimeConstant = 0.72;
+    src.connect(analyser);
+    analyser.connect(audioCtx.destination);
+    beatData = new Uint8Array(analyser.frequencyBinCount);
+  } catch(e) { console.warn('AudioContext failed:', e); }
+}
+
+// Returns true on kick/bass beat, updates beatPulse
+function checkBeat() {
+  beatPulse = Math.max(0, beatPulse - 0.055);
+  if (!analyser) return false;
+  analyser.getByteFrequencyData(beatData);
+  // bins 0-6 cover ~0-560 Hz at 48kHz/512 — kick + bass
+  const bass = (beatData[0]+beatData[1]+beatData[2]+beatData[3]+beatData[4]+beatData[5]+beatData[6])/7;
+  bassAvg = bassAvg * 0.94 + bass * 0.06; // slow-moving average
+  const now = performance.now();
+  if (bass > Math.max(bassAvg * 1.38, 85) && now - lastBeatTime > BEAT_COOLDOWN) {
+    lastBeatTime = now;
+    beatPulse = 1;
+    return true;
+  }
+  return false;
+}
+
+// Fallback: if no beat detected for >1.5s, use timed spawn
+let fallbackSpawnTick = 0;
+
 function startMusic() {
   if (musicGoing) { music.currentTime = 0; return; }
   musicGoing = true;
-  music.loop = false; // we handle loop ourselves for replay
+  music.loop = false;
+  initAudio();
   music.play().catch(() => {});
 }
 music.addEventListener('ended', () => {
@@ -368,7 +409,7 @@ function handleTap(p) {
 // ══════════════════════════════════════════════════════════
 function beginGame() {
   state=S.PLAY; score=0; lives=3; catchTotal=0;
-  orbs=[]; spawnTick=0; sparkles=[]; confetti=[];
+  orbs=[]; spawnTick=0; fallbackSpawnTick=0; sparkles=[]; confetti=[];
   SLOTS.forEach(s=>s.color=null);
   PLR.x=VW/2; levelNum=0; nextStatIdx=0; isNewRecord=false;
   statCard={visible:false,idx:-1,timer:0,phase:'in'};
@@ -530,8 +571,10 @@ function drawLights() {
 
   LIGHTS.forEach((l,i)=>{
     const twink=.5+.5*Math.sin(now*2.2+l.phase);
-    ctx.beginPath(); ctx.arc(l.x,24+Math.sin(i*.8)*.5,5,0,Math.PI*2);
-    ctx.fillStyle=l.color; ctx.shadowColor=l.color; ctx.shadowBlur=twink*16;
+    const pulse = beatPulse > 0 ? 1 + beatPulse * 0.7 : 1; // scale up on beat
+    const r = 5 * pulse;
+    ctx.beginPath(); ctx.arc(l.x,24+Math.sin(i*.8)*.5,r,0,Math.PI*2);
+    ctx.fillStyle=l.color; ctx.shadowColor=l.color; ctx.shadowBlur=(twink+beatPulse)*18;
     ctx.fill(); ctx.shadowBlur=0;
   });
 }
@@ -796,10 +839,18 @@ function drawPlay() {
     }
   }
 
-  // spawn — use per-level config
-  spawnTick++;
+  // spawn — beat-driven + fallback timer
   const cfg = LEVEL_CONFIG[Math.min(levelNum, LEVEL_CONFIG.length-1)];
-  if(spawnTick >= cfg.interval){ spawnOrb(); spawnTick=0; }
+  const beat = checkBeat();
+  if (beat && orbs.length < cfg.maxOrbs) { spawnOrb(); fallbackSpawnTick = 0; }
+  fallbackSpawnTick++;
+  if (fallbackSpawnTick > cfg.interval * 2) { spawnOrb(); fallbackSpawnTick = 0; } // safety net
+
+  // beat pulse overlay — subtle flash on kick
+  if (beatPulse > 0.01) {
+    ctx.fillStyle = `rgba(255,230,160,${beatPulse * 0.06})`;
+    ctx.fillRect(0, 0, VW, VH);
+  }
 
   // move player
   if(touchX !== null){
@@ -838,7 +889,17 @@ function drawPlay() {
 
   orbs.forEach(drawOrb);
   tickSparkles();
-  drawPlayer();
+
+  // player bounces on beat
+  if (beatPulse > 0) {
+    const bounce = Math.sin(beatPulse * Math.PI) * 5;
+    ctx.save();
+    ctx.translate(0, -bounce);
+    drawPlayer();
+    ctx.restore();
+  } else {
+    drawPlayer();
+  }
   drawHUD();
   tickStatCard();
 }
