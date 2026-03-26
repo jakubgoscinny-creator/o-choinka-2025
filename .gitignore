@@ -1,0 +1,19 @@
+# Duże pliki mediów — nie potrzebne w repo
+*.mp4
+*.MOV
+*.HEIC
+*.JPEG
+*.zip
+*.xlsx
+*.pdf
+*.docx
+*.csv
+
+# Zachowujemy
+!ochoinka.png
+!ochoinka*.png
+!tlo.png
+!zrzutka qr.png
+!Untitled design - logo.png
+!muzyka.wav
+!gra.html

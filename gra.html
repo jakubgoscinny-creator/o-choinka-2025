@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>O Choinka! 🎄 Łap Ozdoby! 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #070e24;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'IM Fell English', Georgia, serif;
+        }
+
+        #wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        #gameCanvas {
+            display: block;
+            cursor: none;
+        }
+
+        /* ── Donate overlay ───────────────────────────── */
+        #donateScreen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 50% 30%, #14301a 0%, #090f0a 100%);
+            color: #f0e6c8;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+            z-index: 10;
+            overflow-y: auto;
+        }
+        #donateScreen.visible { display: flex; }
+
+        #donateScreen .inner {
+            max-width: 520px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        #donateScreen .logo-wrap img {
+            max-width: 200px;
+            max-height: 100px;
+            filter: drop-shadow(0 0 18px rgba(255,215,0,0.45));
+        }
+
+        #donateScreen h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.4em, 4vw, 2em);
+            color: #ffd700;
+            text-shadow: 0 0 30px rgba(255,215,0,0.5);
+            line-height: 1.2;
+        }
+
+        #donateScreen .tagline {
+            font-style: italic;
+            font-size: clamp(0.9em, 2.5vw, 1.1em);
+            opacity: 0.85;
+            line-height: 1.65;
+            max-width: 420px;
+        }
+
+        #donateScreen .qr-wrap {
+            background: #fff;
+            padding: 14px;
+            border-radius: 14px;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 40px rgba(255,215,0,0.25), 0 0 80px rgba(255,215,0,0.1);
+        }
+        #donateScreen .qr-wrap img {
+            width: 160px;
+            height: 160px;
+            display: block;
+        }
+        #donateScreen .qr-label {
+            font-size: 0.8em;
+            color: #222;
+            margin-top: 6px;
+            font-family: monospace;
+        }
+
+        #donateScreen .btn-donate {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(0.95em, 2.5vw, 1.15em);
+            color: #1a2c1a;
+            background: linear-gradient(135deg, #ffd700 0%, #f0a800 100%);
+            text-decoration: none;
+            padding: 14px 36px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 700;
+            box-shadow: 0 4px 24px rgba(255,215,0,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        #donateScreen .btn-donate:hover {
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 6px 40px rgba(255,215,0,0.6);
+        }
+
+        #donateScreen .fine {
+            font-size: 0.8em;
+            opacity: 0.55;
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        #donateScreen .replay {
+            font-size: 0.85em;
+            color: rgba(200,190,160,0.7);
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+        #donateScreen .replay:hover { color: #ffd700; }
+
+        /* mute button */
+        #muteBtn {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,215,0,0.35);
+            color: #ffd700;
+            font-size: 18px;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        #muteBtn:hover { background: rgba(255,215,0,0.18); }
+
+        /* gold divider */
+        #donateScreen .divider {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ffd70088, transparent);
+        }
+    </style>
+</head>
+<body>
+<audio id="bgMusic" loop preload="auto">
+    <source src="muzyka.wav" type="audio/wav">
+</audio>
+
+<div id="wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <button id="muteBtn" title="Wycisz / Włącz muzykę">🔊</button>
+
+    <!-- Donate screen (HTML for easy link/image handling) -->
+    <div id="donateScreen">
+        <div class="inner">
+            <div class="logo-wrap">
+                <img src="ochoinka.png" alt="O Choinka!" onerror="this.style.display='none'">
+            </div>
+
+            <h1>🎄 Dziękujemy!</h1>
+
+            <p class="tagline">
+                Twoja gra pomogła nam opowiedzieć o akcji<br>
+                <strong>O Choinka! 2025</strong>.<br>
+                Teraz możesz wesprzeć prawdziwe dzieci —<br>
+                każda złotówka to krok bliżej choinki&nbsp;🎁
+            </p>
+
+            <div class="divider"></div>
+
+            <div class="qr-wrap">
+                <img src="zrzutka qr.png" alt="QR zrzutka.pl/ny5gz6"
+                     onerror="this.parentElement.innerHTML='<p style=\'padding:20px;font-size:0.9em;color:#333\'>📱 zrzutka.pl/ny5gz6</p>'">
+                <div class="qr-label">zrzutka.pl/ny5gz6</div>
+            </div>
+
+            <a class="btn-donate" href="https://zrzutka.pl/ny5gz6" target="_blank" rel="noopener">
+                💛 Wpłać na choinkę
+            </a>
+
+            <p class="fine">
+                Fundacja FDDS i wolontariusze akcji O&nbsp;Choinka! 2025 dziękują
+                za każde wsparcie. Razem możemy więcej! ❤️
+            </p>
+
+            <button class="replay" onclick="restartFromDonate()">↩ Zagraj jeszcze raz</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  O CHOINKA! 2025 — Łap Ozdoby!  •  canvas game
+// ═══════════════════════════════════════════════════════════════
+
+const canvas  = document.getElementById('gameCanvas');
+const ctx     = canvas.getContext('2d');
+const donate$ = document.getElementById('donateScreen');
+
+// ─── MUSIC ────────────────────────────────────────────────────
+const music   = document.getElementById('bgMusic');
+const muteBtn = document.getElementById('muteBtn');
+music.volume  = 0.55;
+let musicStarted = false;
+
+function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    music.play().catch(() => {});
+}
+
+muteBtn.addEventListener('click', () => {
+    music.muted = !music.muted;
+    muteBtn.textContent = music.muted ? '🔇' : '🔊';
+});
+// also allow toggling with M key
+document.addEventListener('keydown', e => {
+    if (e.key === 'm' || e.key === 'M') muteBtn.click();
+});
+
+// Virtual resolution
+const VW = 800, VH = 600;
+let   scale = 1;
+
+function applyResize() {
+    const s = Math.min(window.innerWidth / VW, window.innerHeight / VH);
+    scale = s;
+    canvas.width  = Math.round(VW * s);
+    canvas.height = Math.round(VH * s);
+    canvas.style.width  = canvas.width  + 'px';
+    canvas.style.height = canvas.height + 'px';
+    ctx.setTransform(s, 0, 0, s, 0, 0);
+    const w = document.getElementById('wrapper');
+    w.style.width  = canvas.width  + 'px';
+    w.style.height = canvas.height + 'px';
+}
+window.addEventListener('resize', applyResize);
+applyResize();
+
+// ─── polyfill roundRect ───────────────────────────────────────
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+        const v = typeof r === 'number' ? [r,r,r,r] : [...r];
+        while (v.length < 4) v.push(v[0]);
+        const [tl,tr,br,bl] = v;
+        this.beginPath();
+        this.moveTo(x+tl,y);
+        this.lineTo(x+w-tr,y); this.quadraticCurveTo(x+w,y,   x+w,y+tr);
+        this.lineTo(x+w,y+h-br); this.quadraticCurveTo(x+w,y+h,x+w-br,y+h);
+        this.lineTo(x+bl,y+h); this.quadraticCurveTo(x,  y+h,x,  y+h-bl);
+        this.lineTo(x,y+tl); this.quadraticCurveTo(x,  y,  x+tl,y);
+        this.closePath();
+        return this;
+    };
+}
+
+// ─── STATE ────────────────────────────────────────────────────
+const S = { START:0, PLAY:1, WIN:2, LOSE:3 };
+let state = S.START;
+
+// ─── GAME DATA ────────────────────────────────────────────────
+let score = 0, lives = 3;
+let sparkles = [], confetti = [];
+let winTimer = 0;
+
+// ─── TREE ─────────────────────────────────────────────────────
+const TCX = 625;                         // tree centre-x
+const LAYERS = [
+    { py: 82,  by: 215, hw: 65  },      // top (smallest)
+    { py: 168, by: 335, hw: 100 },      // mid
+    { py: 262, by: 460, hw: 140 },      // bot (largest)
+];
+const TTRUNK = { y: 460, h: 62, w: 26 };
+
+// 20 ornament slots (inside tree silhouette)
+const SLOTS = [
+    // top layer
+    { x: TCX,      y: 148 }, { x: TCX-26, y: 175 }, { x: TCX+26, y: 175 },
+    // mid layer
+    { x: TCX,      y: 228 }, { x: TCX-44, y: 254 }, { x: TCX+44, y: 254 },
+    { x: TCX-18,   y: 282 }, { x: TCX+18, y: 282 }, { x: TCX,    y: 308 },
+    // bot layer
+    { x: TCX,      y: 355 }, { x: TCX-62, y: 346 }, { x: TCX+62, y: 346 },
+    { x: TCX-82,   y: 386 }, { x: TCX+82, y: 386 }, { x: TCX-36, y: 387 },
+    { x: TCX+36,   y: 387 }, { x: TCX,    y: 408 }, { x: TCX-55, y: 428 },
+    { x: TCX+55,   y: 428 }, { x: TCX,    y: 448 },
+].map(s => ({ ...s, color: null }));
+
+const TARGET = SLOTS.length; // 20
+
+// ─── PARTICLES ────────────────────────────────────────────────
+const SNOW = Array.from({ length: 80 }, () => ({
+    x:     Math.random() * VW,
+    y:     Math.random() * VH,
+    r:     Math.random() * 2.8 + 0.7,
+    speed: Math.random() * 1.1 + 0.4,
+    drift: (Math.random() - 0.5) * 0.45,
+    a:     Math.random() * 0.55 + 0.2,
+}));
+
+const STARS = Array.from({ length: 110 }, () => ({
+    x: Math.random() * VW,
+    y: Math.random() * VH * 0.65,
+    r: Math.random() * 1.4 + 0.25,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.025 + 0.008,
+}));
+
+// ─── ORBS ─────────────────────────────────────────────────────
+const COLORS = ['#e63946','#2196f3','#9c27b0','#ff9800','#e91e63','#43a047','#ffd700','#00bcd4'];
+const TYPES  = ['ball','star','gift','bell'];
+let orbs = [], spawnTick = 0;
+
+function newOrb() {
+    orbs.push({
+        x:     50 + Math.random() * (VW - 100),
+        y:     -30,
+        r:     17 + Math.random() * 8,
+        speed: 2.2 + (score / TARGET) * 2.8 + Math.random() * 1.2,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        type:  TYPES [Math.floor(Math.random() * TYPES.length)],
+        ang:   Math.random() * Math.PI * 2,
+        spin:  (Math.random() - 0.5) * 0.09,
+    });
+}
+
+// ─── PLAYER ───────────────────────────────────────────────────
+const PLR = { x: VW / 2, y: VH - 62, w: 72, h: 48, spd: 7.5, left: false, right: false };
+let mouseVX = null;
+
+// ─── BUTTONS (canvas coords) ──────────────────────────────────
+const BTNS = {
+    start:  { x: 300, y: 390, w: 200, h: 52 },
+    donate: { x: 230, y: 440, w: 310, h: 52 },
+    again:  { x: 300, y: 512, w: 200, h: 38 },
+    retry:  { x: 300, y: 420, w: 200, h: 52 },
+};
+
+// ─── IMAGES ───────────────────────────────────────────────────
+const IMG_LOGO = new Image(); IMG_LOGO.src = 'ochoinka.png';
+const IMG_QR   = new Image(); IMG_QR.src   = 'zrzutka qr.png';
+// background texture (try tlo.png)
+const IMG_TLO  = new Image(); IMG_TLO.src  = 'tlo.png';
+
+// ═══════════════════════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+    if (e.key==='ArrowLeft'  || e.key==='a' || e.key==='A') PLR.left  = true;
+    if (e.key==='ArrowRight' || e.key==='d' || e.key==='D') PLR.right = true;
+    if (e.key==='Enter' || e.key===' ') {
+        if (state===S.START) beginGame();
+        if (state===S.LOSE)  resetGame();
+    }
+});
+document.addEventListener('keyup', e => {
+    if (e.key==='ArrowLeft'  || e.key==='a' || e.key==='A') PLR.left  = false;
+    if (e.key==='ArrowRight' || e.key==='d' || e.key==='D') PLR.right = false;
+});
+
+function canvasXY(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - r.left) / scale, y: (src.clientY - r.top) / scale };
+}
+
+canvas.addEventListener('mousemove', e => { mouseVX = canvasXY(e).x; });
+canvas.addEventListener('mouseleave', ()=> { mouseVX = null; });
+canvas.addEventListener('click', e => onClick(canvasXY(e)));
+canvas.addEventListener('touchstart', e => { e.preventDefault(); mouseVX = canvasXY(e).x; onClick(canvasXY(e)); }, { passive: false });
+canvas.addEventListener('touchmove',  e => { e.preventDefault(); mouseVX = canvasXY(e).x; }, { passive: false });
+canvas.addEventListener('touchend',   ()=> { /* keep mouseVX */ });
+
+function inBtn(p, b) { return p.x>=b.x && p.x<=b.x+b.w && p.y>=b.y && p.y<=b.y+b.h; }
+
+function onClick(p) {
+    if (state===S.START && inBtn(p, BTNS.start))  beginGame();
+    if (state===S.WIN   && inBtn(p, BTNS.donate)) showDonate();
+    if (state===S.WIN   && inBtn(p, BTNS.again))  resetGame();
+    if (state===S.LOSE  && inBtn(p, BTNS.retry))  resetGame();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FLOW
+// ═══════════════════════════════════════════════════════════════
+function beginGame() {
+    startMusic();
+    state = S.PLAY;
+    score = 0; lives = 3;
+    orbs = []; spawnTick = 0;
+    sparkles = []; confetti = [];
+    SLOTS.forEach(s => s.color = null);
+    PLR.x = VW / 2;
+}
+function resetGame() {
+    donate$.classList.remove('visible');
+    beginGame();
+}
+function showDonate() { donate$.classList.add('visible'); }
+
+window.restartFromDonate = resetGame;
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAW HELPERS
+// ═══════════════════════════════════════════════════════════════
+function hx(h, a = 80) {
+    const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
+    return `rgba(${r},${g},${b},${a/100})`;
+}
+function lighten(h, d = 60) {
+    const r=parseInt(h.slice(1,3),16), g=parseInt(h.slice(3,5),16), b=parseInt(h.slice(5,7),16);
+    return `rgb(${Math.min(255,r+d)},${Math.min(255,g+d)},${Math.min(255,b+d)})`;
+}
+
+function drawStarShape(x, y, r, color, rot = 0) {
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(rot);
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) {
+        const a = (Math.PI / 5) * i - Math.PI / 2;
+        const rr = i % 2 === 0 ? r : r * 0.42;
+        i===0 ? ctx.moveTo(Math.cos(a)*rr, Math.sin(a)*rr)
+              : ctx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.shadowColor = color; ctx.shadowBlur = 14;
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawBall(x, y, r, color) {
+    const g = ctx.createRadialGradient(x-r*.3, y-r*.3, r*.08, x, y, r);
+    g.addColorStop(0, lighten(color, 70)); g.addColorStop(1, color);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = g; ctx.shadowColor = color; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0;
+    // cap
+    ctx.fillStyle = '#b8900a';
+    ctx.fillRect(x-3, y-r-6, 6, 7);
+    // shine
+    ctx.beginPath(); ctx.arc(x-r*.33, y-r*.3, r*.22, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.38)'; ctx.fill();
+}
+
+function drawGift(x, y, r, color) {
+    const s = r * 1.5;
+    ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 10;
+    ctx.beginPath(); ctx.roundRect(x-s/2, y-s/2, s, s, 5); ctx.fill(); ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x,y-s/2); ctx.lineTo(x,y+s/2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-s/2,y); ctx.lineTo(x+s/2,y); ctx.stroke();
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath(); ctx.arc(x, y-s/2+3, 5, 0, Math.PI*2); ctx.fill();
+}
+
+function drawBell(x, y, r, color) {
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(0, -r*.1, r, Math.PI, 0);
+    ctx.lineTo(r, r*.55); ctx.arc(0, r*.55, r, 0, Math.PI); ctx.closePath();
+    ctx.fill(); ctx.shadowBlur = 0;
+    ctx.fillStyle = '#b8900a';
+    ctx.beginPath(); ctx.arc(0, r*.72, r*.28, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+}
+
+function drawOrb(o) {
+    ctx.save();
+    switch (o.type) {
+        case 'ball': drawBall(o.x, o.y, o.r, o.color); break;
+        case 'star': drawStarShape(o.x, o.y, o.r, o.color, o.ang); break;
+        case 'gift': drawGift(o.x, o.y, o.r, o.color); break;
+        case 'bell': drawBell(o.x, o.y, o.r, o.color); break;
+    }
+    ctx.restore();
+}
+
+// ─── TREE ─────────────────────────────────────────────────────
+function drawTree(lit) {
+    const now = Date.now() / 1000;
+
+    LAYERS.forEach(L => {
+        const g = ctx.createLinearGradient(TCX-L.hw, 0, TCX+L.hw, 0);
+        if (lit) {
+            g.addColorStop(0,'#1a6632'); g.addColorStop(.5,'#27994c'); g.addColorStop(1,'#1a6632');
+        } else {
+            g.addColorStop(0,'#0f3318'); g.addColorStop(.5,'#1a5c30'); g.addColorStop(1,'#0f3318');
+        }
+        ctx.beginPath();
+        ctx.moveTo(TCX, L.py);
+        ctx.lineTo(TCX-L.hw, L.by);
+        ctx.lineTo(TCX+L.hw, L.by);
+        ctx.closePath();
+        ctx.fillStyle = g;
+        ctx.shadowColor = lit ? '#27994c' : 'transparent';
+        ctx.shadowBlur  = lit ? 22 : 0;
+        ctx.fill(); ctx.shadowBlur = 0;
+        ctx.strokeStyle = lit ? '#3dba66' : '#091c10';
+        ctx.lineWidth = 1.5; ctx.stroke();
+    });
+
+    // trunk
+    ctx.fillStyle = '#5c3112';
+    ctx.fillRect(TCX-TTRUNK.w/2, TTRUNK.y, TTRUNK.w, TTRUNK.h);
+
+    // top star
+    const starLit = score >= TARGET;
+    drawStarShape(TCX, LAYERS[0].py - 18, 22,
+        starLit ? '#ffd700' : '#7a6000',
+        starLit ? now * 0.8 : 0);
+
+    // placed ornaments
+    SLOTS.forEach((sl, i) => {
+        if (!sl.color) return;
+        const g2 = ctx.createRadialGradient(sl.x-2, sl.y-2, 1, sl.x, sl.y, 8);
+        g2.addColorStop(0, lighten(sl.color,55)); g2.addColorStop(1, sl.color);
+        ctx.beginPath(); ctx.arc(sl.x, sl.y, 8, 0, Math.PI*2);
+        ctx.fillStyle = g2; ctx.shadowColor = sl.color;
+        ctx.shadowBlur = lit ? 14 : 8; ctx.fill(); ctx.shadowBlur = 0;
+
+        if (lit) {
+            const twink = 0.35 + 0.65 * Math.abs(Math.sin(now * 2.1 + i * 0.66));
+            ctx.beginPath(); ctx.arc(sl.x, sl.y, 13, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(255,255,200,${twink * 0.22})`; ctx.fill();
+        }
+    });
+
+    // light string when lit
+    if (lit) {
+        for (let i = 0; i < 14; i++) {
+            const t = now * 1.8 + i * 0.5;
+            const x = TCX + Math.sin(i * 1.4) * (40 + i * 5);
+            const y = 140 + i * 25;
+            const c = COLORS[i % COLORS.length];
+            ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI*2);
+            ctx.fillStyle = c; ctx.shadowColor = c;
+            ctx.shadowBlur = 8 + 6 * Math.abs(Math.sin(t)); ctx.fill(); ctx.shadowBlur = 0;
+        }
+    }
+}
+
+// ─── PLAYER ───────────────────────────────────────────────────
+function drawPlayer() {
+    const { x, y, w, h } = PLR;
+    const g = ctx.createLinearGradient(x-w/2, y, x+w/2, y);
+    g.addColorStop(0,'#a81630'); g.addColorStop(.5,'#e63946'); g.addColorStop(1,'#a81630');
+    ctx.beginPath(); ctx.roundRect(x-w/2, y-h/2, w, h, [w/2,w/2,10,10]);
+    ctx.fillStyle = g; ctx.shadowColor = '#e6394688'; ctx.shadowBlur = 18; ctx.fill(); ctx.shadowBlur = 0;
+    // ribbon
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath(); ctx.ellipse(x, y-h/2+9, 11, 7, 0, 0, Math.PI*2); ctx.fill();
+    // shine
+    ctx.beginPath(); ctx.roundRect(x-w/2+4, y-h/2+4, w-8, h/3, [w/2-4, w/2-4, 2, 2]);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill();
+}
+
+// ─── BACKGROUND ───────────────────────────────────────────────
+function drawBG() {
+    const sky = ctx.createLinearGradient(0,0,0,VH);
+    sky.addColorStop(0,'#040a1c'); sky.addColorStop(0.55,'#0b1636'); sky.addColorStop(1,'#0d1f10');
+    ctx.fillStyle = sky; ctx.fillRect(0,0,VW,VH);
+
+    // subtle texture overlay
+    if (IMG_TLO.complete && IMG_TLO.naturalWidth > 0) {
+        ctx.globalAlpha = 0.08;
+        ctx.drawImage(IMG_TLO, 0, 0, VW, VH);
+        ctx.globalAlpha = 1;
+    }
+
+    // twinkling stars
+    STARS.forEach(s => {
+        s.phase += s.speed;
+        const a = 0.35 + 0.65 * Math.abs(Math.sin(s.phase));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.fill();
+    });
+
+    // ground snowdrift
+    const gd = ctx.createLinearGradient(0, VH-28, 0, VH);
+    gd.addColorStop(0,'rgba(210,228,255,0.85)'); gd.addColorStop(1,'rgba(200,220,255,1)');
+    ctx.fillStyle = gd;
+    ctx.beginPath(); ctx.ellipse(VW/2, VH+6, VW*0.65, 36, 0, 0, Math.PI*2); ctx.fill();
+}
+
+function updateDrawSnow() {
+    SNOW.forEach(s => {
+        s.y += s.speed; s.x += s.drift;
+        if (s.y > VH+4) { s.y = -4; s.x = Math.random()*VW; }
+        if (s.x > VW) s.x = 0; if (s.x < 0) s.x = VW;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(210,228,255,${s.a})`; ctx.fill();
+    });
+}
+
+// ─── HUD ──────────────────────────────────────────────────────
+function drawHUD() {
+    // ornament count
+    ctx.font = 'bold 20px "IM Fell English",Georgia,serif';
+    ctx.fillStyle = '#ffd700'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
+    ctx.fillText(`🎁  ${score} / ${TARGET}`, 18, 38); ctx.shadowBlur = 0;
+
+    // progress bar
+    const bw = 160, bh = 7, bx = 18, by = 48;
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 4); ctx.fill();
+    const prog = ctx.createLinearGradient(bx,0,bx+bw,0);
+    prog.addColorStop(0,'#ffd700'); prog.addColorStop(1,'#ff9800');
+    ctx.fillStyle = prog; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.roundRect(bx, by, bw*(score/TARGET), bh, 4); ctx.fill(); ctx.shadowBlur = 0;
+
+    // lives
+    ctx.font = '26px serif'; ctx.textAlign = 'right';
+    let h = '';
+    for (let i=0; i<3; i++) h += i < lives ? '❤️' : '🖤';
+    ctx.fillText(h, VW-16, 40);
+}
+
+// ─── SPARKLES ─────────────────────────────────────────────────
+function burst(x, y, color) {
+    for (let i=0; i<14; i++) {
+        const a = (Math.PI*2/14)*i, sp = 2.5+Math.random()*3;
+        sparkles.push({ x, y, vx: Math.cos(a)*sp, vy: Math.sin(a)*sp, life:1, color });
+    }
+}
+function tickSparkles() {
+    sparkles = sparkles.filter(e => e.life > 0);
+    sparkles.forEach(e => {
+        e.x+=e.vx; e.y+=e.vy; e.vy+=0.12; e.life-=0.045;
+        ctx.beginPath(); ctx.arc(e.x, e.y, 4.5, 0, Math.PI*2);
+        const r=parseInt(e.color.slice(1,3),16), g2=parseInt(e.color.slice(3,5),16), b=parseInt(e.color.slice(5,7),16);
+        ctx.fillStyle=`rgba(${r},${g2},${b},${e.life})`;
+        ctx.shadowColor=e.color; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+    });
+}
+
+// ─── CONFETTI ─────────────────────────────────────────────────
+function initConfetti() {
+    confetti = Array.from({length:70}, ()=>({
+        x: Math.random()*VW, y: -20-Math.random()*120,
+        vx: (Math.random()-.5)*3.5, vy: 2+Math.random()*2.2,
+        r: 4+Math.random()*6, rot: Math.random()*Math.PI*2,
+        spin: (Math.random()-.5)*0.2,
+        color: COLORS[Math.floor(Math.random()*COLORS.length)],
+    }));
+}
+function tickConfetti() {
+    confetti.forEach(c => {
+        c.x+=c.vx; c.y+=c.vy; c.rot+=c.spin;
+        if (c.y>VH+20) c.y=-20;
+        ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.rot);
+        ctx.fillStyle=c.color; ctx.fillRect(-c.r/2,-c.r/4,c.r,c.r/2);
+        ctx.restore();
+    });
+}
+
+// ─── BUTTON ───────────────────────────────────────────────────
+function drawBtn(b, label, gold=false) {
+    const g = ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
+    if (gold) { g.addColorStop(0,'#ffd700'); g.addColorStop(1,'#e6a800'); }
+    else       { g.addColorStop(0,'#c41e3a'); g.addColorStop(1,'#8f1228'); }
+    ctx.beginPath(); ctx.roundRect(b.x,b.y,b.w,b.h,b.h/2);
+    ctx.fillStyle=g; ctx.shadowColor=gold?'#ffd70099':'#e6394666'; ctx.shadowBlur=20; ctx.fill();
+    ctx.strokeStyle=gold?'rgba(255,255,255,0.4)':'#ffd70060'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.fillStyle=gold?'#1a1a1a':'#fff';
+    ctx.font=`bold ${b.h<45?14:17}px "IM Fell English",Georgia,serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label, b.x+b.w/2, b.y+b.h/2);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCREENS
+// ═══════════════════════════════════════════════════════════════
+function drawStart() {
+    drawBG(); updateDrawSnow(); drawTree(false);
+
+    // frosted panel
+    ctx.fillStyle='rgba(6,12,34,0.86)';
+    ctx.beginPath(); ctx.roundRect(148,68,504,470,18); ctx.fill();
+    ctx.strokeStyle='rgba(255,215,0,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+
+    // logo or title
+    const lw=240, aspect=IMG_LOGO.naturalWidth?IMG_LOGO.naturalHeight/IMG_LOGO.naturalWidth:0.4;
+    const lh=Math.min(aspect*lw,100);
+    if (IMG_LOGO.complete && IMG_LOGO.naturalWidth>0) {
+        ctx.drawImage(IMG_LOGO, 400-lw/2, 85, lw, lh);
+    } else {
+        ctx.font='700 38px "Cinzel Decorative",Georgia,serif';
+        ctx.fillStyle='#ffd700'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+        ctx.shadowColor='#ffd700'; ctx.shadowBlur=22; ctx.fillText('O Choinka!', 400, 148); ctx.shadowBlur=0;
+    }
+
+    // tagline
+    ctx.font='italic 19px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='#f0e6c8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('Łap ozdoby i udekoruj choinkę', 400, 228);
+    ctx.fillText('dla dzieci z akcji O Choinka! 2025 🎄', 400, 256);
+
+    // instructions
+    ctx.font='14px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='rgba(200,190,155,0.8)';
+    ctx.fillText('Sterowanie: ← → klawisze lub ruch myszą / palcem', 400, 308);
+    ctx.fillText(`Złap ${TARGET} ozdób zanim spadną na ziemię!`, 400, 334);
+    ctx.fillText('Masz 3 szanse ❤️', 400, 358);
+
+    drawBtn(BTNS.start, '🎄 ZAGRAJ!');
+
+    ctx.font='12px Georgia,serif'; ctx.fillStyle='rgba(140,130,110,0.5)';
+    ctx.fillText('Akcja O Choinka! 2025 • Fundacja FDDS', 400, 498);
+}
+
+function drawPlay() {
+    drawBG(); updateDrawSnow(); drawTree(false);
+
+    // subtle game-area divider
+    ctx.strokeStyle='rgba(255,255,255,0.04)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(540,0); ctx.lineTo(540,VH-30); ctx.stroke();
+
+    // spawn orbs
+    spawnTick++;
+    const interval = Math.max(28, 85 - score*3);
+    if (spawnTick >= interval) { newOrb(); spawnTick=0; }
+
+    // move player
+    if (mouseVX !== null) {
+        PLR.x = Math.max(PLR.w/2, Math.min(VW-PLR.w/2, mouseVX));
+    } else {
+        if (PLR.left)  PLR.x = Math.max(PLR.w/2,     PLR.x - PLR.spd);
+        if (PLR.right) PLR.x = Math.min(VW-PLR.w/2,  PLR.x + PLR.spd);
+    }
+
+    // move & check orbs
+    orbs = orbs.filter(o => {
+        o.y += o.speed; o.ang += o.spin;
+        const caught = o.y+o.r >= PLR.y-PLR.h/2 && o.y-o.r <= PLR.y+PLR.h/2
+                    && o.x >= PLR.x-PLR.w/2-o.r && o.x <= PLR.x+PLR.w/2+o.r;
+        if (caught) {
+            burst(o.x, o.y, o.color);
+            const sl = SLOTS[score];
+            if (sl) sl.color = o.color;
+            score++;
+            if (score >= TARGET) { state=S.WIN; initConfetti(); }
+            return false;
+        }
+        if (o.y > VH+30) {
+            lives--;
+            if (lives <= 0) state = S.LOSE;
+            return false;
+        }
+        return true;
+    });
+
+    orbs.forEach(drawOrb);
+    tickSparkles();
+    drawPlayer();
+    drawHUD();
+}
+
+function drawWin() {
+    drawBG(); updateDrawSnow(); tickConfetti(); drawTree(true); tickSparkles();
+
+    // panel
+    ctx.fillStyle='rgba(4,14,4,0.9)';
+    ctx.beginPath(); ctx.roundRect(185,90,400,470,18); ctx.fill();
+    ctx.strokeStyle='#ffd700'; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.font='bold 38px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='#ffd700'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.shadowColor='#ffd700'; ctx.shadowBlur=28; ctx.fillText('🎉 Brawo!', 385,148); ctx.shadowBlur=0;
+
+    ctx.font='italic 19px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='#f0e6c8';
+    ctx.fillText('Choinka jest gotowa!', 385, 183);
+
+    ctx.font='15px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='rgba(220,210,175,0.88)';
+    ['Pięknie! Zebrałeś wszystkie ozdoby 🌟','','Dzieci z akcji O Choinka! 2025','czekają na prawdziwe choinki.','Możesz pomóc i to się stanie!'].forEach((l,i) => {
+        ctx.fillText(l, 385, 225 + i*27);
+    });
+
+    drawBtn(BTNS.donate, '💛 Wesprzyj Akcję!', true);
+
+    // small replay
+    ctx.font='italic 13px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='rgba(160,150,120,0.65)'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('lub zagraj jeszcze raz ↩', 385, 525);
+    // invisible clickable area matches BTNS.again
+}
+
+function drawLose() {
+    drawBG(); updateDrawSnow(); drawTree(false);
+
+    ctx.fillStyle='rgba(20,5,5,0.9)';
+    ctx.beginPath(); ctx.roundRect(200,140,380,300,18); ctx.fill();
+    ctx.strokeStyle='#c41e3a'; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.font='bold 38px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='#e63946'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('❄️ Ojej!', 390, 196);
+
+    ctx.font='italic 18px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='#f0e6c8'; ctx.fillText('Ozdoby spadły...', 390, 232);
+
+    ctx.font='15px "IM Fell English",Georgia,serif';
+    ctx.fillStyle='rgba(210,200,170,0.85)';
+    ctx.fillText(`Zebrałeś ${score} z ${TARGET} ozdób.`, 390, 265);
+    ctx.fillText('Ale dzieci nadal czekają! Nie poddawaj się 💪', 390, 291);
+    ctx.fillText('Spróbuj jeszcze raz i udekoruj choinkę!', 390, 315);
+
+    drawBtn(BTNS.retry, '🔄 Spróbuj Znowu');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════════════
+function loop() {
+    ctx.clearRect(0,0,VW,VH);
+    ctx.textBaseline = 'alphabetic';
+    switch (state) {
+        case S.START: drawStart(); break;
+        case S.PLAY:  drawPlay();  break;
+        case S.WIN:   drawWin();   break;
+        case S.LOSE:  drawLose();  break;
+    }
+    requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
