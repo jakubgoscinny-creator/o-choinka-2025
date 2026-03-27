@@ -145,7 +145,7 @@ html,body{
 </style>
 </head>
 <body>
-<audio id="bgMusic" preload="auto"><source src="muzyka.wav" type="audio/wav"></audio>
+<audio id="bgMusic" preload="none"><source src="muzyka.wav" type="audio/wav"></audio>
 
 <div id="wrapper">
   <canvas id="gameCanvas"></canvas>
@@ -984,7 +984,7 @@ const IMG_LOGO=new Image();IMG_LOGO.src='ochoinka.png';
 // ── SCREENS ───────────────────────────────────────────────
 function drawStart(){
   drawBG();drawSnow();drawTree(false);drawLights();
-  const px=22,py=VH*.27,pw=VW-44,ph=VH*.59;
+  const px=22,py=VH*.27,pw=VW-44,ph=VH*.49;
   drawCard(px,py,pw,ph,BR,56,14);
   // logo in header bar
   if(IMG_LOGO.complete&&IMG_LOGO.naturalWidth>0){
@@ -997,17 +997,18 @@ function drawStart(){
   ctx.font=`900 12px ${NUN}`;ctx.fillStyle='rgba(255,255,255,.88)';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText('POMOC ROŚNIE Z KAŻDYM DRZEWKIEM',VW/2,py+47);
 
-  const ty=py+72;
+  const ty=py+84;   // clear the 56px header + 8px gap
   ctx.font=`900 28px ${NUN}`;ctx.fillStyle=BBLK;ctx.textBaseline='alphabetic';ctx.textAlign='center';
   ctx.fillText('ŁAP OZDOBY!',VW/2,ty);
-  ctx.font=`900 13px ${NUN}`;ctx.fillStyle=BG;ctx.fillText('AKCJA O CHOINKA! 2026',VW/2,ty+20);
-  ctx.font=`800 13px ${NUN}`;ctx.fillStyle='#555';
-  ctx.fillText('Przesuń palec lub myszkę — złap ozdoby zanim spadną!',VW/2,ty+46);
+  ctx.font=`900 13px ${NUN}`;ctx.fillStyle=BG;ctx.fillText('AKCJA O CHOINKA! 2026',VW/2,ty+22);
+  ctx.font=`800 12px ${NUN}`;ctx.fillStyle='#666';
+  ctx.fillText('← Przesuń palec lub myszkę →',VW/2,ty+46);
+  ctx.fillText('Złap ozdoby zanim spadną!',VW/2,ty+62);
 
   // stat tiles
   const tiles=[{c:BR,t:'6 POZIOMÓW'},{c:BG,t:'20 OZDÓB'},{c:BGOLD,t:'3 ŻYCIA'}];
   tiles.forEach((tile,i)=>{
-    const tw=90,th=34,tx=px+14+i*(tw+8),tty=ty+72;
+    const tw=90,th=34,tx=px+14+i*(tw+8),tty=ty+90;
     ctx.beginPath();rr(tx+2,tty+3,tw,th,6);ctx.fillStyle=BBLK;ctx.fill();
     ctx.beginPath();rr(tx,tty,tw,th,6);ctx.fillStyle=tile.c;ctx.fill();
     ctx.strokeStyle=BBLK;ctx.lineWidth=2;ctx.stroke();
@@ -1026,8 +1027,9 @@ function drawStart(){
   ctx.fillText('🏆 TOP 10',BTN.scoresLink.x+BTN.scoresLink.w/2,BTN.scoresLink.y+BTN.scoresLink.h/2);
   ctx.restore();
 
+  // footer inside card
   ctx.font=`800 10px ${NUN}`;ctx.fillStyle='rgba(80,70,60,.55)';ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.fillText('Fundacja FDDS  •  800 100 100',VW/2,VH-14);
+  ctx.fillText('Fundacja FDDS  •  800 100 100',VW/2,py+ph-10);
 }
 
 function drawPlay(){
