@@ -163,14 +163,15 @@ function toVirtual(clientX, clientY) {
 music.volume = 0.55;
 let musicGoing = false;
 
+// ── song + level constants (must be before beat array) ────────
+const SONG_DUR  = 185.64;
+const NUM_LEVELS = 6;
+
 // ── BPM-based beat detection (no AudioContext — works on iOS) ─
-// Estimated 91 BPM with ~0.35s intro silence
 const BPM = 91;
-(function buildBeats() {
-  const iv = 60 / BPM, dur = SONG_DUR + 2;
-  window._beats = [];
-  for (let t = 0.35; t < dur; t += iv) window._beats.push(t);
-})();
+const _beats = [];
+for (let t = 0.35; t < SONG_DUR + 2; t += 60 / BPM) _beats.push(t);
+
 let beatIdx = 0, beatPulse = 0, fallbackSpawnTick = 0;
 
 function checkBeat() {
@@ -178,7 +179,7 @@ function checkBeat() {
   if (!musicGoing || !music.duration) return false;
   const t = music.currentTime;
   let hit = false;
-  while (beatIdx < window._beats.length && t >= window._beats[beatIdx]) {
+  while (beatIdx < _beats.length && t >= _beats[beatIdx]) {
     beatIdx++;
     hit = true;
   }
@@ -206,10 +207,7 @@ document.addEventListener('keydown', e => {
 // ══════════════════════════════════════════════════════════
 //  STATS revealed at each level (5 reveals + final)
 // ══════════════════════════════════════════════════════════
-const SONG_DUR = 185.64; // seconds (measured from WAV header)
-const NUM_LEVELS = 6;
 const LEVEL_TIMES = Array.from({length: NUM_LEVELS}, (_,i) => SONG_DUR * (i+1) / NUM_LEVELS);
-// [30.9, 61.9, 92.8, 123.8, 154.7, 185.6]
 
 // Difficulty per level — level 1 very easy, gradual ramp
 const LEVEL_CONFIG = [
