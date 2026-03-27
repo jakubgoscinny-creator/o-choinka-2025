@@ -163,50 +163,33 @@ function toVirtual(clientX, clientY) {
 music.volume = 0.55;
 let musicGoing = false;
 
-// ── Web Audio beat detection ─────────────────────────────────
-let audioCtx = null, analyser = null, beatData = null;
-let lastBeatTime = 0, beatPulse = 0, bassAvg = 80;
-const BEAT_COOLDOWN = 280; // ms — min gap between spawns (~214 BPM max)
+// ── BPM-based beat detection (no AudioContext — works on iOS) ─
+// Estimated 91 BPM with ~0.35s intro silence
+const BPM = 91;
+(function buildBeats() {
+  const iv = 60 / BPM, dur = SONG_DUR + 2;
+  window._beats = [];
+  for (let t = 0.35; t < dur; t += iv) window._beats.push(t);
+})();
+let beatIdx = 0, beatPulse = 0, fallbackSpawnTick = 0;
 
-function initAudio() {
-  if (audioCtx) return;
-  try {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const src = audioCtx.createMediaElementSource(music);
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 512;
-    analyser.smoothingTimeConstant = 0.72;
-    src.connect(analyser);
-    analyser.connect(audioCtx.destination);
-    beatData = new Uint8Array(analyser.frequencyBinCount);
-  } catch(e) { console.warn('AudioContext failed:', e); }
-}
-
-// Returns true on kick/bass beat, updates beatPulse
 function checkBeat() {
   beatPulse = Math.max(0, beatPulse - 0.055);
-  if (!analyser) return false;
-  analyser.getByteFrequencyData(beatData);
-  // bins 0-6 cover ~0-560 Hz at 48kHz/512 — kick + bass
-  const bass = (beatData[0]+beatData[1]+beatData[2]+beatData[3]+beatData[4]+beatData[5]+beatData[6])/7;
-  bassAvg = bassAvg * 0.94 + bass * 0.06; // slow-moving average
-  const now = performance.now();
-  if (bass > Math.max(bassAvg * 1.38, 85) && now - lastBeatTime > BEAT_COOLDOWN) {
-    lastBeatTime = now;
-    beatPulse = 1;
-    return true;
+  if (!musicGoing || !music.duration) return false;
+  const t = music.currentTime;
+  let hit = false;
+  while (beatIdx < window._beats.length && t >= window._beats[beatIdx]) {
+    beatIdx++;
+    hit = true;
   }
+  if (hit) { beatPulse = 1; return true; }
   return false;
 }
 
-// Fallback: if no beat detected for >1.5s, use timed spawn
-let fallbackSpawnTick = 0;
-
 function startMusic() {
-  if (musicGoing) { music.currentTime = 0; return; }
+  if (musicGoing) { music.currentTime = 0; beatIdx = 0; return; }
   musicGoing = true;
   music.loop = false;
-  initAudio();
   music.play().catch(() => {});
 }
 music.addEventListener('ended', () => {
@@ -306,8 +289,10 @@ const SLOTS = [
   {x:TCX+55, y:310},{x:TCX,   y:360},{x:TCX-80,y:360},{x:TCX+80,y:360},
   {x:TCX-40, y:388},{x:TCX+40,y:388},{x:TCX,   y:408},{x:TCX-90,y:390},
   {x:TCX+90, y:390},{x:TCX,   y:435},
-].map(s=>({...s,color:null}));
+].map(s=>({...s, color:null, upgraded:false}));
 const TARGET = SLOTS.length; // 20
+const DELUXE_COLORS = ['#ffd700','#ff4dc4','#00e5ff','#76ff03','#ff6d00','#e040fb'];
+let upgradeCount = 0;
 
 // ── player ────────────────────────────────────────────────────
 const PLR = { x: VW/2, y: 648, w: 82, h: 48, speed: 9 };
@@ -410,8 +395,9 @@ function handleTap(p) {
 function beginGame() {
   state=S.PLAY; score=0; lives=3; catchTotal=0;
   orbs=[]; spawnTick=0; fallbackSpawnTick=0; sparkles=[]; confetti=[];
-  SLOTS.forEach(s=>s.color=null);
+  SLOTS.forEach(s=>{s.color=null; s.upgraded=false;});
   PLR.x=VW/2; levelNum=0; nextStatIdx=0; isNewRecord=false;
+  upgradeCount=0; beatIdx=0;
   statCard={visible:false,idx:-1,timer:0,phase:'in'};
   startMusic();
 }
@@ -491,12 +477,34 @@ function drawBell(x,y,r,color) {
   ctx.fillStyle='#a07800'; ctx.beginPath(); ctx.arc(0,r*.72,r*.28,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
+function drawDeluxe(o) {
+  // sparkly trail
+  (o.trail||[]).forEach((p,i)=>{
+    const a = (i/o.trail.length)*0.35;
+    ctx.beginPath(); ctx.arc(p.x,p.y,o.r*(i/o.trail.length)*0.5,0,Math.PI*2);
+    ctx.fillStyle=rgba(o.color,a); ctx.fill();
+  });
+  // outer halo
+  ctx.beginPath(); ctx.arc(o.x,o.y,o.r+6,0,Math.PI*2);
+  ctx.fillStyle=rgba(o.color,0.15);
+  ctx.shadowColor=o.color; ctx.shadowBlur=22; ctx.fill(); ctx.shadowBlur=0;
+  // 8-point star body
+  starPath(o.x,o.y,o.r,o.r*.45,8,o.ang);
+  const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.3,1,o.x,o.y,o.r);
+  g.addColorStop(0,'#fff'); g.addColorStop(0.3,lighten(o.color,60)); g.addColorStop(1,o.color);
+  ctx.fillStyle=g; ctx.shadowColor=o.color; ctx.shadowBlur=18; ctx.fill(); ctx.shadowBlur=0;
+  // center sparkle
+  ctx.beginPath(); ctx.arc(o.x,o.y,o.r*.25,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fill();
+}
+
 function drawOrb(o) {
   switch(o.type){
-    case 'ball': drawBall(o.x,o.y,o.r,o.color); break;
-    case 'star': drawStar(o.x,o.y,o.r,o.color,o.ang); break;
-    case 'gift': drawGift(o.x,o.y,o.r,o.color); break;
-    case 'bell': drawBell(o.x,o.y,o.r,o.color); break;
+    case 'ball':   drawBall(o.x,o.y,o.r,o.color); break;
+    case 'star':   drawStar(o.x,o.y,o.r,o.color,o.ang); break;
+    case 'gift':   drawGift(o.x,o.y,o.r,o.color); break;
+    case 'bell':   drawBell(o.x,o.y,o.r,o.color); break;
+    case 'deluxe': drawDeluxe(o); break;
   }
 }
 
@@ -606,12 +614,23 @@ function drawTree(lit=false) {
   // placed ornaments
   SLOTS.forEach((sl,i)=>{
     if(!sl.color)return;
-    const g2=ctx.createRadialGradient(sl.x-2,sl.y-2,1,sl.x,sl.y,8);
+    const r = sl.upgraded ? 12 : 8;
+    const g2=ctx.createRadialGradient(sl.x-r*.3,sl.y-r*.3,1,sl.x,sl.y,r);
     g2.addColorStop(0,lighten(sl.color,55)); g2.addColorStop(1,sl.color);
-    ctx.beginPath(); ctx.arc(sl.x,sl.y,8,0,Math.PI*2);
-    ctx.fillStyle=g2; ctx.shadowColor=sl.color; ctx.shadowBlur=lit?16:9;
+    // upgraded: gold outer ring
+    if(sl.upgraded){
+      ctx.beginPath(); ctx.arc(sl.x,sl.y,r+4,0,Math.PI*2);
+      ctx.strokeStyle='#ffd700'; ctx.lineWidth=1.5;
+      ctx.shadowColor='#ffd700'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+      // pulsing halo
+      const tw=.4+.6*Math.abs(Math.sin(now*2.5+i*.6));
+      ctx.beginPath(); ctx.arc(sl.x,sl.y,r+8,0,Math.PI*2);
+      ctx.fillStyle=rgba(sl.color,tw*.28); ctx.fill();
+    }
+    ctx.beginPath(); ctx.arc(sl.x,sl.y,r,0,Math.PI*2);
+    ctx.fillStyle=g2; ctx.shadowColor=sl.color; ctx.shadowBlur=sl.upgraded?20:(lit?16:9);
     ctx.fill(); ctx.shadowBlur=0;
-    if(lit){
+    if(lit && !sl.upgraded){
       const tw=.3+.7*Math.abs(Math.sin(now*2+i*.7));
       ctx.beginPath(); ctx.arc(sl.x,sl.y,12,0,Math.PI*2);
       ctx.fillStyle=rgba(sl.color,tw*.22); ctx.fill();
@@ -659,7 +678,13 @@ function drawHUD() {
   // score
   ctx.font='bold 20px "IM Fell English",Georgia,serif';
   ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd70099'; ctx.shadowBlur=8;
-  ctx.fillText(`🎁 ${catchTotal}`, 14, 52); ctx.shadowBlur=0;
+  if(catchTotal >= TARGET){
+    ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=14;
+    ctx.fillText(`✨ UPGRADE! +${upgradeCount}`, 14, 52);
+  } else {
+    ctx.fillText(`🎁 ${catchTotal}`, 14, 52);
+  }
+  ctx.shadowBlur=0;
 
   // progress bar (tree fill)
   const bw=140,bh=7,bx=14,by=58;
@@ -862,25 +887,46 @@ function drawPlay() {
   }
 
   // move & collide orbs
+  const isUpgrade = catchTotal >= TARGET;
   orbs=orbs.filter(o=>{
+    // update trail for deluxe orbs
+    if(o.type==='deluxe'){
+      if(!o.trail) o.trail=[];
+      o.trail.push({x:o.x, y:o.y});
+      if(o.trail.length > 10) o.trail.shift();
+    }
     o.y+=o.speed; o.ang+=o.spin;
     const caught = o.y+o.r>=PLR.y-PLR.h/2 && o.y-o.r<=PLR.y+PLR.h/2
                 && o.x>=PLR.x-PLR.w/2-o.r  && o.x<=PLR.x+PLR.w/2+o.r;
     if(caught){
-      burst(o.x,o.y,o.color);
-      if(catchTotal<TARGET){ const sl=SLOTS[catchTotal]; if(sl) sl.color=o.color; }
+      burst(o.x,o.y,o.color, o.type==='deluxe'?20:14);
+      if(!isUpgrade){
+        // normal: fill next tree slot
+        if(catchTotal<TARGET){ const sl=SLOTS[catchTotal]; if(sl) sl.color=o.color; }
+      } else {
+        // upgrade: replace a random non-upgraded slot (or any slot)
+        const pool = SLOTS.filter(s=>s.color && !s.upgraded);
+        const target = pool.length>0
+          ? pool[Math.floor(Math.random()*pool.length)]
+          : SLOTS[Math.floor(Math.random()*TARGET)];
+        target.color = o.color;
+        target.upgraded = true;
+        upgradeCount++;
+      }
       catchTotal++;
       return false;
     }
     if(o.y>VH+30){
-      lives--;
-      if(lives<=0){
-        if(catchTotal > highScore){
-          highScore=catchTotal;
-          localStorage.setItem('choinka_hs',String(catchTotal));
-          isNewRecord=true;
+      if(!isUpgrade){ // only lose lives for non-upgrade orbs
+        lives--;
+        if(lives<=0){
+          if(catchTotal > highScore){
+            highScore=catchTotal;
+            localStorage.setItem('choinka_hs',String(catchTotal));
+            isNewRecord=true;
+          }
+          state=S.LOSE;
         }
-        state=S.LOSE;
       }
       return false;
     }
@@ -906,17 +952,31 @@ function drawPlay() {
 
 function spawnOrb() {
   const cfg = LEVEL_CONFIG[Math.min(levelNum, LEVEL_CONFIG.length-1)];
-  if(orbs.length >= cfg.maxOrbs) return;
-  orbs.push({
-    x: 30+Math.random()*(VW-60),
-    y: -28,
-    r: 16+Math.random()*9,
-    speed: cfg.baseSpeed + Math.random()*cfg.randSpeed,
-    color: ORB_COLORS[Math.floor(Math.random()*ORB_COLORS.length)],
-    type:  ORB_TYPES [Math.floor(Math.random()*ORB_TYPES.length)],
-    ang: Math.random()*Math.PI*2,
-    spin:(Math.random()-.5)*.08,
-  });
+  const isUpgrade = catchTotal >= TARGET;
+  const maxOnScreen = isUpgrade ? cfg.maxOrbs + 1 : cfg.maxOrbs;
+  if(orbs.length >= maxOnScreen) return;
+
+  if (isUpgrade) {
+    // deluxe upgrade orb — larger, sparkly, faster
+    orbs.push({
+      x: 30+Math.random()*(VW-60), y: -30,
+      r: 22 + Math.random()*6,
+      speed: cfg.baseSpeed * 1.1 + Math.random()*cfg.randSpeed,
+      color: DELUXE_COLORS[Math.floor(Math.random()*DELUXE_COLORS.length)],
+      type: 'deluxe',
+      ang: Math.random()*Math.PI*2, spin: 0.04 + Math.random()*0.04,
+      trail: [],
+    });
+  } else {
+    orbs.push({
+      x: 30+Math.random()*(VW-60), y: -28,
+      r: 16+Math.random()*9,
+      speed: cfg.baseSpeed + Math.random()*cfg.randSpeed,
+      color: ORB_COLORS[Math.floor(Math.random()*ORB_COLORS.length)],
+      type:  ORB_TYPES[Math.floor(Math.random()*ORB_TYPES.length)],
+      ang: Math.random()*Math.PI*2, spin:(Math.random()-.5)*.08,
+    });
+  }
 }
 
 // ── win screen ────────────────────────────────────────────────
