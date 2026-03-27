@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>O Choinka! 🎄 Łap Ozdoby! 2025</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{
   width:100%;height:100%;
-  background:#030a1a;
+  background:#030f05;
   overflow:hidden;
-  font-family:'IM Fell English',Georgia,serif;
+  font-family:'Nunito',Arial,sans-serif;
   touch-action:none;
 }
 #wrapper{
@@ -31,68 +31,86 @@ html,body{
   position:absolute;
   bottom:max(env(safe-area-inset-bottom,0px) + 10px, 14px);
   right:14px;
-  background:rgba(0,0,0,0.5);
-  border:1.5px solid rgba(255,215,0,0.4);
-  color:#ffd700;font-size:20px;
+  background:#D62828;
+  border:2.5px solid #1A1A1A;
+  color:#fff;font-size:18px;font-weight:900;
   width:44px;height:44px;border-radius:50%;
   cursor:pointer;z-index:30;
   display:flex;align-items:center;justify-content:center;
+  box-shadow:3px 3px 0 #1A1A1A;
 }
 
 /* ── DONATE SCREEN ── */
 #donateScreen{
   display:none;
   position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 25%, #152a18 0%, #070f08 100%);
-  color:#f0e6c8;
+  background:#FEFDF8;
+  color:#1A1A1A;
   flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:env(safe-area-inset-top,0px) 24px env(safe-area-inset-bottom,0px);
-  padding-top:max(env(safe-area-inset-top,0px), 24px);
-  overflow-y:auto;gap:14px;z-index:20;
+  padding:0 24px env(safe-area-inset-bottom,0px);
+  overflow-y:auto;gap:12px;z-index:20;
 }
 #donateScreen.on{display:flex}
 
-#donateScreen .logo img{
-  max-width:min(220px,60vw);max-height:90px;
-  filter:drop-shadow(0 0 20px rgba(255,215,0,.45));
+/* red header bar */
+.donate-header{
+  width:calc(100% + 48px);
+  margin-left:-24px;
+  background:#D62828;
+  padding:max(env(safe-area-inset-top,0px),16px) 24px 16px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  border-bottom:3px solid #1A1A1A;
+  flex-shrink:0;
 }
-#donateScreen h1{
-  font-family:'Cinzel Decorative',serif;
-  font-size:clamp(1.3em,5vw,1.9em);
-  color:#ffd700;text-align:center;
-  text-shadow:0 0 28px rgba(255,215,0,.5);
+.donate-header img{
+  max-width:min(100px,30vw);max-height:60px;
+  object-fit:contain;
+  filter:brightness(0) invert(1);
 }
+.donate-header h1{
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:clamp(1.3em,5.5vw,1.9em);
+  color:#FFFFFF;text-align:center;text-transform:uppercase;
+  letter-spacing:0.5px;margin:0;
+}
+
 #donateScreen .msg{
-  font-size:clamp(.9em,3.5vw,1.05em);
-  text-align:center;opacity:.88;line-height:1.7;
-  max-width:380px;
+  font-family:'Nunito',sans-serif;font-weight:800;
+  font-size:clamp(.85em,3.2vw,1em);
+  text-align:center;line-height:1.65;
+  max-width:360px;color:#1A1A1A;
 }
 .qr-card{
-  background:#fff;padding:14px;border-radius:14px;
-  border:3px solid #ffd700;
-  box-shadow:0 0 40px rgba(255,215,0,.25);
+  background:#fff;padding:14px;border-radius:10px;
+  border:2.5px solid #1A1A1A;
+  box-shadow:4px 4px 0 #D62828;
   text-align:center;
 }
-.qr-card img{width:min(160px,50vw);height:min(160px,50vw);display:block}
-.qr-card p{font-size:.75em;color:#333;margin-top:5px;font-family:monospace}
+.qr-card img{width:min(150px,46vw);height:min(150px,46vw);display:block}
+.qr-card p{font-size:.75em;color:#1A1A1A;margin-top:6px;font-family:'Nunito',sans-serif;font-weight:900;}
 .btn-donate{
-  font-family:'Cinzel Decorative',serif;
-  font-size:clamp(.95em,4vw,1.15em);
-  color:#1a2a1a;
-  background:linear-gradient(135deg,#ffd700,#f0a800);
-  text-decoration:none;padding:14px 36px;
-  border-radius:50px;display:inline-block;
-  box-shadow:0 4px 24px rgba(255,215,0,.4);
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:clamp(1em,4.2vw,1.15em);
+  text-transform:uppercase;letter-spacing:0.5px;
+  color:#fff;background:#D62828;
+  text-decoration:none;padding:14px 32px;
+  border-radius:8px;border:2.5px solid #1A1A1A;
+  display:inline-block;box-shadow:4px 4px 0 #1A1A1A;
+  transition:transform .1s,box-shadow .1s;
 }
-.fine{font-size:.78em;opacity:.5;text-align:center;max-width:340px;line-height:1.6}
+.btn-donate:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #1A1A1A;}
+.fine{font-size:.78em;opacity:.65;text-align:center;max-width:340px;line-height:1.6;font-family:'Nunito',sans-serif;font-weight:800}
 .replay-btn{
-  font-size:.85em;color:rgba(200,190,160,.7);
-  background:none;border:none;font-family:inherit;
-  cursor:pointer;text-decoration:underline;
-  padding:8px 0;
+  font-size:.85em;color:#1A1A1A;
+  background:none;border:2.5px solid #1A1A1A;
+  border-radius:8px;
+  font-family:'Nunito',sans-serif;font-weight:900;
+  cursor:pointer;padding:10px 24px;
+  box-shadow:3px 3px 0 #1A1A1A;
+  transition:transform .1s,box-shadow .1s;
 }
-.replay-btn:hover{color:#ffd700}
-.divider{width:100px;height:1px;background:linear-gradient(90deg,transparent,#ffd70066,transparent)}
+.replay-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #1A1A1A;}
+.divider{width:80px;height:3px;background:#D62828;border-radius:2px;margin:4px 0;}
 </style>
 </head>
 <body>
@@ -106,13 +124,15 @@ html,body{
   <button id="muteBtn">🔊</button>
 
   <div id="donateScreen">
-    <div class="logo"><img src="ochoinka.png" alt="O Choinka!" onerror="this.style.display='none'"></div>
-    <h1>🎄 Dziękujemy!</h1>
+    <div class="donate-header">
+      <img src="ochoinka.png" alt="O Choinka!" onerror="this.style.display='none'">
+      <h1>Dziękujemy! 🎄</h1>
+    </div>
     <p class="msg">Twoja gra opowiedziała historię akcji <strong>O&nbsp;Choinka!&nbsp;2025</strong>.<br>
     Teraz możesz wesprzeć prawdziwe dzieci — każda złotówka to krok bliżej choinki!</p>
     <div class="divider"></div>
     <div class="qr-card">
-      <img src="zrzutka qr.png" alt="QR" onerror="this.parentElement.innerHTML='<p style=\'padding:20px;color:#333\'>📱 zrzutka.pl/ny5gz6</p>'">
+      <img src="zrzutka qr.png" alt="QR" onerror="this.parentElement.innerHTML='<p style=\'padding:20px;color:#333;font-weight:900\'>📱 zrzutka.pl/ny5gz6</p>'">
       <p>zrzutka.pl/ny5gz6</p>
     </div>
     <a class="btn-donate" href="https://zrzutka.pl/ny5gz6" target="_blank" rel="noopener">💛 Wpłać na choinkę</a>
@@ -124,8 +144,18 @@ html,body{
 <script>
 // ═══════════════════════════════════════════════════════════
 //  O CHOINKA! 2025  •  Łap Ozdoby!
-//  mobile-first portrait canvas game
+//  Brand redesign: O Choinka! identity system
 // ═══════════════════════════════════════════════════════════
+
+// ── BRAND TOKENS ──────────────────────────────────────────
+const BR = '#D62828';   // brand red
+const BG = '#1B5E20';   // brand green
+const BGL= '#2E7D32';   // brand green light
+const BGG= '#43A047';   // brand green bright
+const BGOLD = '#C8A84B';// brand gold
+const BBLK = '#1A1A1A'; // brand black
+const BWHT = '#FEFDF8'; // brand white/cream
+const NUN  = "'Nunito',Arial,sans-serif"; // brand font
 
 const canvas  = document.getElementById('gameCanvas');
 const ctx     = canvas.getContext('2d');
@@ -137,14 +167,13 @@ document.getElementById('replayBtn').addEventListener('click', resetGame);
 // Virtual canvas size (portrait mobile-first)
 const VW = 420, VH = 720;
 
-// Scale factor + canvas sizing
-let cx_off = 0, cy_off = 0; // css offset (for correct click mapping)
+// Scale + canvas sizing
 function applyResize() {
   const s = Math.min(window.innerWidth / VW, window.innerHeight / VH);
   const cw = Math.round(VW * s), ch = Math.round(VH * s);
   canvas.style.width  = cw + 'px';
   canvas.style.height = ch + 'px';
-  canvas.width  = VW;   // draw at virtual resolution, browser scales via CSS
+  canvas.width  = VW;
   canvas.height = VH;
 }
 window.addEventListener('resize', applyResize);
@@ -159,11 +188,11 @@ function toVirtual(clientX, clientY) {
   };
 }
 
-// ── music ───────────────────────────────────────────────────
+// ── music ────────────────────────────────────────────────────
 music.volume = 0.55;
 let musicGoing = false;
 
-// ── song + level constants (must be before beat array) ────────
+// ── song + level constants ────────────────────────────────────
 const SONG_DUR  = 185.64;
 const NUM_LEVELS = 6;
 
@@ -205,46 +234,28 @@ document.addEventListener('keydown', e => {
 });
 
 // ══════════════════════════════════════════════════════════
-//  STATS revealed at each level (5 reveals + final)
+//  STATS revealed at each level
 // ══════════════════════════════════════════════════════════
 const LEVEL_TIMES = Array.from({length: NUM_LEVELS}, (_,i) => SONG_DUR * (i+1) / NUM_LEVELS);
 
-// Difficulty per level — level 1 very easy, gradual ramp
+// Difficulty per level
 const LEVEL_CONFIG = [
-  { baseSpeed: 1.5, randSpeed: 0.5, maxOrbs: 1, interval: 105 }, // L1 — easy
+  { baseSpeed: 1.5, randSpeed: 0.5, maxOrbs: 1, interval: 105 }, // L1
   { baseSpeed: 1.9, randSpeed: 0.6, maxOrbs: 2, interval: 90  }, // L2
   { baseSpeed: 2.4, randSpeed: 0.7, maxOrbs: 2, interval: 76  }, // L3
   { baseSpeed: 2.9, randSpeed: 0.8, maxOrbs: 3, interval: 64  }, // L4
   { baseSpeed: 3.4, randSpeed: 0.9, maxOrbs: 3, interval: 54  }, // L5
-  { baseSpeed: 4.0, randSpeed: 1.0, maxOrbs: 4, interval: 46  }, // L6 — hard
+  { baseSpeed: 4.0, randSpeed: 1.0, maxOrbs: 4, interval: 46  }, // L6
 ];
 
+// Brand-colored stat tiles (like poster grid)
+const STAT_TILE_COLORS = [BR, BG, BGOLD, BR, BG];
 const STATS = [
-  {
-    icon: '🎄', num: '720+',
-    line1: 'choinek dotarło', line2: 'do dzieci w potrzebie',
-    color: '#43c96f',
-  },
-  {
-    icon: '🚗', num: '4 200 km',
-    line1: 'przejechali wolontariusze', line2: 'po całej Polsce',
-    color: '#e63946',
-  },
-  {
-    icon: '🗺️', num: '12 miast',
-    line1: 'objęła akcja O Choinka!', line2: 'Warszawa, Poznań, Wrocław i więcej…',
-    color: '#42a5f5',
-  },
-  {
-    icon: '💝', num: '380+',
-    line1: 'darczyńców pomogło', line2: 'od drożdżówki po 500 zł',
-    color: '#ffd700',
-  },
-  {
-    icon: '📺', num: 'TVN Fakty',
-    line1: 'pokazały akcję —', line2: 'i ruszyła lawina wpłat!',
-    color: '#ce93d8',
-  },
+  { icon:'🎄', num:'720+',     line1:'choinek dotarło',         line2:'do dzieci w potrzebie'       },
+  { icon:'🚗', num:'4 200 km', line1:'przejechali wolontariusze', line2:'po całej Polsce'            },
+  { icon:'🗺️', num:'12 miast', line1:'objęła akcja O Choinka!',  line2:'Warszawa, Poznań, Wrocław…' },
+  { icon:'💝', num:'380+',     line1:'darczyńców pomogło',       line2:'od drożdżówki po 500 zł'    },
+  { icon:'📺', num:'TVN Fakty',line1:'pokazały akcję —',         line2:'i ruszyła lawina wpłat!'     },
 ];
 
 // ══════════════════════════════════════════════════════════
@@ -253,24 +264,17 @@ const STATS = [
 const S = { START: 0, PLAY: 1, STAT: 2, WIN: 3, LOSE: 4 };
 let state = S.START;
 
-// ── stat reveal ─────────────────────────────────────────────
-let statCard = {
-  visible: false,
-  idx: -1,
-  timer: 0,
-  phase: 'in', // in / hold / out
-};
-let nextStatIdx = 0; // which stat to show next
+let statCard = { visible: false, idx: -1, timer: 0, phase: 'in' };
+let nextStatIdx = 0;
 
-// ── gameplay vars ────────────────────────────────────────────
 let score = 0, lives = 3, catchTotal = 0;
 let orbs = [], spawnTick = 0;
 let sparkles = [], confetti = [];
-let levelNum = 0; // current level (0-5)
+let levelNum = 0;
 let highScore = parseInt(localStorage.getItem('choinka_hs') || '0');
 let isNewRecord = false;
 
-// ── tree slots ───────────────────────────────────────────────
+// ── tree slots ────────────────────────────────────────────
 const TCX = 210;
 const TREE_LAYERS = [
   { py: 95,  by: 210, hw: 72  },
@@ -278,35 +282,34 @@ const TREE_LAYERS = [
   { py: 280, by: 460, hw: 155 },
 ];
 const SLOTS = [
-  // top (3)
   {x:TCX,    y:155},{x:TCX-30,y:180},{x:TCX+30,y:180},
-  // mid (7)
   {x:TCX,    y:230},{x:TCX-50,y:258},{x:TCX+50,y:258},
   {x:TCX-22, y:280},{x:TCX+22,y:280},{x:TCX,   y:302},{x:TCX-55,y:310},
-  // bot (10)
   {x:TCX+55, y:310},{x:TCX,   y:360},{x:TCX-80,y:360},{x:TCX+80,y:360},
   {x:TCX-40, y:388},{x:TCX+40,y:388},{x:TCX,   y:408},{x:TCX-90,y:390},
   {x:TCX+90, y:390},{x:TCX,   y:435},
 ].map(s=>({...s, color:null, upgraded:false}));
 const TARGET = SLOTS.length; // 20
-const DELUXE_COLORS = ['#ffd700','#ff4dc4','#00e5ff','#76ff03','#ff6d00','#e040fb'];
+
+// Upgrade mode — brand-aligned deluxe colors
+const DELUXE_COLORS = [BGOLD, BR, BGL, '#FFD700', '#FFFFFF', BR];
 let upgradeCount = 0;
 
-// ── player ────────────────────────────────────────────────────
+// ── player ────────────────────────────────────────────────
 const PLR = { x: VW/2, y: 648, w: 82, h: 48, speed: 9 };
 let keys = {left:false, right:false};
 let touchX = null;
 
-// ── particles ────────────────────────────────────────────────
+// ── particles ─────────────────────────────────────────────
 const SNOW_BG = Array.from({length:50}, ()=>({
   x:Math.random()*VW, y:Math.random()*VH,
   r:Math.random()*1.5+0.5, speed:Math.random()*0.7+0.3,
-  drift:(Math.random()-.5)*.3, a:Math.random()*.35+.1,
+  drift:(Math.random()-.5)*.3, a:Math.random()*.3+.08,
 }));
 const SNOW_FG = Array.from({length:30}, ()=>({
   x:Math.random()*VW, y:Math.random()*VH,
   r:Math.random()*2.5+1, speed:Math.random()*1.2+0.6,
-  drift:(Math.random()-.5)*.5, a:Math.random()*.6+.25,
+  drift:(Math.random()-.5)*.5, a:Math.random()*.5+.2,
 }));
 const STAR_FIELD = Array.from({length:80}, ()=>({
   x:Math.random()*VW, y:Math.random()*(VH*.55),
@@ -314,19 +317,19 @@ const STAR_FIELD = Array.from({length:80}, ()=>({
   spd:Math.random()*.02+.008,
 }));
 
-// ── light string (top decoration) ────────────────────────────
-const LIGHT_COLORS = ['#e63946','#ffd700','#43c96f','#42a5f5','#ce93d8','#ff9800'];
+// ── light string — brand colors ───────────────────────────
+const LIGHT_COLORS = [BR, BGOLD, BGL, '#FFFFFF', BR, BGOLD, BGL, '#FFFFFF'];
 const LIGHTS = Array.from({length:18}, (_, i)=>({
   x: 12 + i*(VW-24)/17,
   color: LIGHT_COLORS[i % LIGHT_COLORS.length],
   phase: Math.random()*Math.PI*2,
 }));
 
-// ── aurora state ──────────────────────────────────────────────
+// ── aurora ─────────────────────────────────────────────────
 let auroraT = 0;
 
-// ── orb config ────────────────────────────────────────────────
-const ORB_COLORS = ['#e63946','#2196f3','#9c27b0','#ff9800','#e91e63','#43a047','#ffd700','#00bcd4'];
+// ── orb colors — brand + classic Christmas ─────────────────
+const ORB_COLORS = [BR, '#2196f3', '#9c27b0', BGOLD, '#e91e63', BGL, '#FFD700', '#00bcd4'];
 const ORB_TYPES  = ['ball','star','gift','bell'];
 
 // ══════════════════════════════════════════════════════════
@@ -366,13 +369,12 @@ canvas.addEventListener('click', e => {
 
 function inBox(p,b) { return p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h; }
 
-// button hit-boxes (virtual coords)
 const BTN = {
   start:   {x:110, y:570, w:200, h:58},
   donate:  {x:60,  y:540, w:300, h:58},
   again:   {x:110, y:615, w:200, h:44},
-  retry:   {x:20,  y:548, w:182, h:56}, // lose screen — left
-  donate2: {x:218, y:548, w:182, h:56}, // lose screen — right
+  retry:   {x:20,  y:548, w:182, h:56},
+  donate2: {x:218, y:548, w:182, h:56},
 };
 
 function handleTap(p) {
@@ -419,8 +421,6 @@ function rgba(h,a) {
   const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
   return `rgba(${r},${g},${b},${a})`;
 }
-
-// rounded rect helper (canvas has it natively in modern browsers, polyfill for older)
 function rr(x,y,w,h,r) {
   if(ctx.roundRect) { ctx.roundRect(x,y,w,h,r); return; }
   const R = typeof r==='number'?r:r[0];
@@ -431,7 +431,6 @@ function rr(x,y,w,h,r) {
   ctx.lineTo(x,y+R); ctx.quadraticCurveTo(x,y,x+R,y);
   ctx.closePath();
 }
-
 function starPath(x,y,R,r,pts=5,rot=0) {
   ctx.beginPath();
   for(let i=0;i<pts*2;i++){
@@ -443,59 +442,85 @@ function starPath(x,y,R,r,pts=5,rot=0) {
   ctx.closePath();
 }
 
+// ── brand button: flat fill + bold black border + hard shadow ─
+function drawBtn(b, label, gold=false) {
+  ctx.save();
+  // hard shadow (brand style)
+  ctx.beginPath(); rr(b.x+4, b.y+5, b.w, b.h, 8);
+  ctx.fillStyle = BBLK; ctx.fill();
+  // main button
+  ctx.beginPath(); rr(b.x, b.y, b.w, b.h, 8);
+  ctx.fillStyle = gold ? BGOLD : BR;
+  ctx.fill();
+  ctx.strokeStyle = BBLK; ctx.lineWidth = 2.5; ctx.stroke();
+  // label
+  ctx.fillStyle = gold ? BBLK : '#FFFFFF';
+  ctx.font = `900 ${b.h<50?15:17}px ${NUN}`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, b.x+b.w/2, b.y+b.h/2);
+  ctx.restore();
+}
+
+// ── orb shapes ────────────────────────────────────────────
 function drawBall(x,y,r,color) {
   const g=ctx.createRadialGradient(x-r*.3,y-r*.3,r*.08,x,y,r);
   g.addColorStop(0,lighten(color,70)); g.addColorStop(1,color);
   ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fillStyle=g; ctx.shadowColor=color; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
-  ctx.fillStyle='#a07800'; ctx.fillRect(x-3,y-r-6,6,8);
+  ctx.fillStyle=g; ctx.shadowColor=color; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
+  // cap
+  ctx.fillStyle='#6a4000'; ctx.fillRect(x-3,y-r-5,6,7);
+  // shine
   ctx.beginPath(); ctx.arc(x-r*.3,y-r*.28,r*.22,0,Math.PI*2);
   ctx.fillStyle='rgba(255,255,255,.38)'; ctx.fill();
+  // brand outline
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,0,0,.25)'; ctx.lineWidth=1; ctx.stroke();
 }
 function drawStar(x,y,r,color,rot) {
   starPath(x,y,r,r*.4,5,rot);
-  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=12; ctx.fill(); ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=1; ctx.stroke();
 }
 function drawGift(x,y,r,color) {
   const s=r*1.5;
   ctx.beginPath(); rr(x-s/2,y-s/2,s,s,5);
-  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
-  ctx.strokeStyle='#ffd700'; ctx.lineWidth=3;
+  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=8; ctx.fill(); ctx.shadowBlur=0;
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1.5;
+  ctx.beginPath(); rr(x-s/2,y-s/2,s,s,5); ctx.stroke();
+  // ribbon
+  ctx.strokeStyle=BGOLD; ctx.lineWidth=3;
   ctx.beginPath(); ctx.moveTo(x,y-s/2); ctx.lineTo(x,y+s/2); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(x-s/2,y); ctx.lineTo(x+s/2,y); ctx.stroke();
-  ctx.fillStyle='#ffd700'; ctx.beginPath(); ctx.arc(x,y-s/2+3,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=BGOLD; ctx.beginPath(); ctx.arc(x,y-s/2+3,5,0,Math.PI*2); ctx.fill();
 }
 function drawBell(x,y,r,color) {
   ctx.save(); ctx.translate(x,y);
-  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=10;
+  ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=8;
   ctx.beginPath();
   ctx.arc(0,-r*.1,r,Math.PI,0); ctx.lineTo(r,r*.55);
   ctx.arc(0,r*.55,r,0,Math.PI); ctx.closePath();
   ctx.fill(); ctx.shadowBlur=0;
-  ctx.fillStyle='#a07800'; ctx.beginPath(); ctx.arc(0,r*.72,r*.28,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(0,0,0,.3)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle='#6a4000'; ctx.beginPath(); ctx.arc(0,r*.72,r*.28,0,Math.PI*2); ctx.fill();
   ctx.restore();
 }
 function drawDeluxe(o) {
-  // sparkly trail
   (o.trail||[]).forEach((p,i)=>{
     const a = (i/o.trail.length)*0.35;
     ctx.beginPath(); ctx.arc(p.x,p.y,o.r*(i/o.trail.length)*0.5,0,Math.PI*2);
     ctx.fillStyle=rgba(o.color,a); ctx.fill();
   });
-  // outer halo
   ctx.beginPath(); ctx.arc(o.x,o.y,o.r+6,0,Math.PI*2);
   ctx.fillStyle=rgba(o.color,0.15);
-  ctx.shadowColor=o.color; ctx.shadowBlur=22; ctx.fill(); ctx.shadowBlur=0;
-  // 8-point star body
+  ctx.shadowColor=o.color; ctx.shadowBlur=20; ctx.fill(); ctx.shadowBlur=0;
   starPath(o.x,o.y,o.r,o.r*.45,8,o.ang);
   const g=ctx.createRadialGradient(o.x-o.r*.3,o.y-o.r*.3,1,o.x,o.y,o.r);
   g.addColorStop(0,'#fff'); g.addColorStop(0.3,lighten(o.color,60)); g.addColorStop(1,o.color);
-  ctx.fillStyle=g; ctx.shadowColor=o.color; ctx.shadowBlur=18; ctx.fill(); ctx.shadowBlur=0;
-  // center sparkle
+  ctx.fillStyle=g; ctx.shadowColor=o.color; ctx.shadowBlur=16; ctx.fill(); ctx.shadowBlur=0;
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1.5; ctx.stroke();
   ctx.beginPath(); ctx.arc(o.x,o.y,o.r*.25,0,Math.PI*2);
   ctx.fillStyle='rgba(255,255,255,.9)'; ctx.fill();
 }
-
 function drawOrb(o) {
   switch(o.type){
     case 'ball':   drawBall(o.x,o.y,o.r,o.color); break;
@@ -506,52 +531,53 @@ function drawOrb(o) {
   }
 }
 
-// ── button ────────────────────────────────────────────────────
-function drawBtn(b, label, gold=false) {
-  ctx.save();
-  ctx.beginPath(); rr(b.x,b.y,b.w,b.h,b.h/2);
-  const g=ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
-  if(gold){ g.addColorStop(0,'#ffd700'); g.addColorStop(1,'#e6a800'); }
-  else     { g.addColorStop(0,'#c41e3a'); g.addColorStop(1,'#8f1228'); }
-  ctx.fillStyle=g; ctx.shadowColor=gold?'#ffd700':'#e63946'; ctx.shadowBlur=22; ctx.fill();
-  ctx.strokeStyle=gold?'rgba(255,255,255,.35)':'rgba(255,215,0,.4)'; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.shadowBlur=0;
-  ctx.fillStyle=gold?'#1a1a1a':'#fff';
-  ctx.font=`bold ${b.h<50?15:17}px 'IM Fell English',Georgia,serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(label, b.x+b.w/2, b.y+b.h/2);
-  ctx.restore();
-}
-
-// ── background ────────────────────────────────────────────────
+// ── background ─────────────────────────────────────────────
 function drawBG() {
-  // base sky gradient
+  // deep forest green sky
   const sky=ctx.createLinearGradient(0,0,0,VH);
-  sky.addColorStop(0,'#030812'); sky.addColorStop(0.5,'#071530'); sky.addColorStop(1,'#061a0d');
+  sky.addColorStop(0,'#010a02');
+  sky.addColorStop(0.45,'#031508');
+  sky.addColorStop(1,'#020e04');
   ctx.fillStyle=sky; ctx.fillRect(0,0,VW,VH);
 
-  // aurora borealis
+  // aurora (brand green tones)
   auroraT += 0.004;
   const ax = VW*.5 + Math.sin(auroraT)*VW*.3;
-  const ag = ctx.createRadialGradient(ax,0,10,ax,80,280);
-  ag.addColorStop(0,`rgba(30,180,100,${.12+Math.sin(auroraT*.7)*.06})`);
-  ag.addColorStop(0.5,`rgba(20,60,160,${.08+Math.sin(auroraT*.5+1)*.04})`);
+  const ag = ctx.createRadialGradient(ax,0,10,ax,80,300);
+  ag.addColorStop(0,`rgba(27,94,32,${.2+Math.sin(auroraT*.7)*.07})`);
+  ag.addColorStop(0.5,`rgba(214,40,40,${.04+Math.sin(auroraT*.5+1)*.02})`);
   ag.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=ag; ctx.fillRect(0,0,VW,VH*.45);
 
   // stars
   STAR_FIELD.forEach(s=>{
     s.phase+=s.spd;
-    const a=.3+.7*Math.abs(Math.sin(s.phase));
+    const a=.2+.5*Math.abs(Math.sin(s.phase));
     ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
     ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill();
   });
 
-  // ground snow drift
-  const gd=ctx.createLinearGradient(0,VH-30,0,VH);
-  gd.addColorStop(0,'rgba(200,220,255,.75)'); gd.addColorStop(1,'rgba(210,228,255,1)');
-  ctx.fillStyle=gd;
+  // ground snow (brand-tinted)
+  ctx.fillStyle='#E0EEE0';
   ctx.beginPath(); ctx.ellipse(VW/2,VH+4,VW*.7,38,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.ellipse(VW/2,VH+4,VW*.7,38,0,0,Math.PI); ctx.stroke();
+
+  // brand corner tiles (top-left red, top-right green)
+  _drawCornerTile(0, 0, BR);
+  _drawCornerTile(VW-34, 0, BG);
+}
+function _drawCornerTile(x, y, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, 34, 34);
+  ctx.strokeStyle = BBLK; ctx.lineWidth = 1.5;
+  ctx.strokeRect(x, y, 34, 34);
+  // mini tree icon
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.beginPath(); ctx.moveTo(x+17,y+5); ctx.lineTo(x+8,y+24); ctx.lineTo(x+26,y+24); ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fillRect(x+15,y+24,4,6);
 }
 
 function drawSnow() {
@@ -560,54 +586,83 @@ function drawSnow() {
     if(s.y>VH+4){ s.y=-4; s.x=Math.random()*VW; }
     if(s.x>VW) s.x=0; if(s.x<0) s.x=VW;
     ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    ctx.fillStyle=`rgba(210,228,255,${s.a})`; ctx.fill();
+    ctx.fillStyle=`rgba(220,240,220,${s.a})`; ctx.fill();
   });
 }
 
-// ── light string ──────────────────────────────────────────────
+// ── light string — brand colors ───────────────────────────
 function drawLights() {
   const now=performance.now()/1000;
-  // string
-  ctx.strokeStyle='rgba(80,60,30,.6)'; ctx.lineWidth=1.5;
+  ctx.strokeStyle='rgba(40,25,10,.7)'; ctx.lineWidth=1.5;
   ctx.beginPath();
   LIGHTS.forEach((l,i)=>{
-    const y=24+Math.sin(i*.8)*.5; // slight droop
+    const y=24+Math.sin(i*.8)*.5;
     i===0?ctx.moveTo(l.x,y):ctx.lineTo(l.x,y);
   }); ctx.stroke();
 
   LIGHTS.forEach((l,i)=>{
     const twink=.5+.5*Math.sin(now*2.2+l.phase);
-    const pulse = beatPulse > 0 ? 1 + beatPulse * 0.7 : 1; // scale up on beat
+    const pulse = beatPulse > 0 ? 1 + beatPulse * 0.7 : 1;
     const r = 5 * pulse;
     ctx.beginPath(); ctx.arc(l.x,24+Math.sin(i*.8)*.5,r,0,Math.PI*2);
-    ctx.fillStyle=l.color; ctx.shadowColor=l.color; ctx.shadowBlur=(twink+beatPulse)*18;
+    ctx.fillStyle=l.color; ctx.shadowColor=l.color; ctx.shadowBlur=(twink+beatPulse)*16;
     ctx.fill(); ctx.shadowBlur=0;
+    // white centre dot when bright
+    if(twink > 0.7){
+      ctx.beginPath(); ctx.arc(l.x,24+Math.sin(i*.8)*.5,r*.4,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,.7)'; ctx.fill();
+    }
   });
 }
 
-// ── tree ───────────────────────────────────────────────────────
+// ── tree — brand green + bold black outlines (like logo) ──
 function drawTree(lit=false) {
   const now=performance.now()/1000;
 
   TREE_LAYERS.forEach(L=>{
-    const g=ctx.createLinearGradient(TCX-L.hw,0,TCX+L.hw,0);
-    if(lit){ g.addColorStop(0,'#1a6832'); g.addColorStop(.5,'#28a04c'); g.addColorStop(1,'#1a6832'); }
-    else    { g.addColorStop(0,'#0d3318'); g.addColorStop(.5,'#195c30'); g.addColorStop(1,'#0d3318'); }
-    ctx.beginPath(); ctx.moveTo(TCX,L.py);
-    ctx.lineTo(TCX-L.hw,L.by); ctx.lineTo(TCX+L.hw,L.by); ctx.closePath();
-    ctx.fillStyle=g; ctx.shadowColor=lit?'#28a04c':'transparent'; ctx.shadowBlur=lit?20:0;
+    // drop shadow for depth
+    ctx.beginPath();
+    ctx.moveTo(TCX+3, L.py+4);
+    ctx.lineTo(TCX-L.hw+3, L.by+3); ctx.lineTo(TCX+L.hw+3, L.by+3);
+    ctx.closePath();
+    ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.fill();
+
+    // main layer — flat brand green
+    ctx.beginPath();
+    ctx.moveTo(TCX, L.py); ctx.lineTo(TCX-L.hw, L.by); ctx.lineTo(TCX+L.hw, L.by);
+    ctx.closePath();
+    ctx.fillStyle = lit ? BGL : BG;
+    if(lit){ ctx.shadowColor=BGG; ctx.shadowBlur=18; }
     ctx.fill(); ctx.shadowBlur=0;
-    ctx.strokeStyle=lit?'#3ec460':'#091b0e'; ctx.lineWidth=1.5; ctx.stroke();
+    // bold black outline — brand signature
+    ctx.strokeStyle=BBLK; ctx.lineWidth=2; ctx.stroke();
+
+    // inner lighter chevron (like logo)
+    const iw = L.hw * 0.55, iy = L.py + (L.by-L.py)*.2;
+    ctx.beginPath();
+    ctx.moveTo(TCX, iy);
+    ctx.lineTo(TCX-iw, L.by - (L.by-L.py)*.05);
+    ctx.lineTo(TCX+iw, L.by - (L.by-L.py)*.05);
+    ctx.closePath();
+    ctx.fillStyle=lit ? BGG : BGL;
+    ctx.globalAlpha=0.45; ctx.fill(); ctx.globalAlpha=1;
   });
 
-  // trunk
-  ctx.fillStyle='#5c3112'; ctx.fillRect(TCX-13,460,26,60);
+  // trunk — brand brown
+  ctx.fillStyle='#5c3112';
+  ctx.fillRect(TCX-13,460,26,58);
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2;
+  ctx.strokeRect(TCX-13,460,26,58);
 
-  // top star
+  // top star — brand gold
   const starLit=catchTotal>=TARGET;
   starPath(TCX,TREE_LAYERS[0].py-18,22,9,5,starLit?now*.8:0);
-  ctx.fillStyle=starLit?'#ffd700':'#6a5200'; ctx.shadowColor='#ffd700';
-  ctx.shadowBlur=starLit?25:0; ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle=starLit?BGOLD:'#3a2800';
+  if(starLit){ ctx.shadowColor=BGOLD; ctx.shadowBlur=24; }
+  ctx.fill(); ctx.shadowBlur=0;
+  if(starLit || catchTotal > 0){
+    ctx.strokeStyle=starLit?BBLK:'rgba(0,0,0,0.3)'; ctx.lineWidth=1.5; ctx.stroke();
+  }
 
   // placed ornaments
   SLOTS.forEach((sl,i)=>{
@@ -615,30 +670,31 @@ function drawTree(lit=false) {
     const r = sl.upgraded ? 12 : 8;
     const g2=ctx.createRadialGradient(sl.x-r*.3,sl.y-r*.3,1,sl.x,sl.y,r);
     g2.addColorStop(0,lighten(sl.color,55)); g2.addColorStop(1,sl.color);
-    // upgraded: gold outer ring
     if(sl.upgraded){
       ctx.beginPath(); ctx.arc(sl.x,sl.y,r+4,0,Math.PI*2);
-      ctx.strokeStyle='#ffd700'; ctx.lineWidth=1.5;
-      ctx.shadowColor='#ffd700'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
-      // pulsing halo
+      ctx.strokeStyle=BGOLD; ctx.lineWidth=1.5;
+      ctx.shadowColor=BGOLD; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
       const tw=.4+.6*Math.abs(Math.sin(now*2.5+i*.6));
       ctx.beginPath(); ctx.arc(sl.x,sl.y,r+8,0,Math.PI*2);
-      ctx.fillStyle=rgba(sl.color,tw*.28); ctx.fill();
+      ctx.fillStyle=rgba(sl.color,tw*.25); ctx.fill();
     }
     ctx.beginPath(); ctx.arc(sl.x,sl.y,r,0,Math.PI*2);
-    ctx.fillStyle=g2; ctx.shadowColor=sl.color; ctx.shadowBlur=sl.upgraded?20:(lit?16:9);
+    ctx.fillStyle=g2; ctx.shadowColor=sl.color; ctx.shadowBlur=sl.upgraded?18:(lit?14:7);
     ctx.fill(); ctx.shadowBlur=0;
+    // small black outline on ornament
+    ctx.strokeStyle='rgba(0,0,0,.35)'; ctx.lineWidth=1; ctx.stroke();
     if(lit && !sl.upgraded){
       const tw=.3+.7*Math.abs(Math.sin(now*2+i*.7));
       ctx.beginPath(); ctx.arc(sl.x,sl.y,12,0,Math.PI*2);
-      ctx.fillStyle=rgba(sl.color,tw*.22); ctx.fill();
+      ctx.fillStyle=rgba(sl.color,tw*.2); ctx.fill();
     }
   });
 
-  // festoon lights (when lit)
+  // festoon lights (when lit) — brand colors
   if(lit){
+    const festC=[BR,BGOLD,BGL,'#fff',BR,BGOLD];
     for(let i=0;i<12;i++){
-      const t=now*1.8+i*.5, fc=ORB_COLORS[i%ORB_COLORS.length];
+      const t=now*1.8+i*.5, fc=festC[i%festC.length];
       const lx=TCX+Math.sin(i*1.5)*(35+i*8), ly=160+i*24;
       ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2);
       ctx.fillStyle=fc; ctx.shadowColor=fc; ctx.shadowBlur=8+5*Math.abs(Math.sin(t));
@@ -647,68 +703,90 @@ function drawTree(lit=false) {
   }
 }
 
-// ── player ─────────────────────────────────────────────────────
+// ── player — brand gift box ────────────────────────────────
 function drawPlayer() {
   const {x,y,w,h}=PLR;
-  const g=ctx.createLinearGradient(x-w/2,y,x+w/2,y);
-  g.addColorStop(0,'#a01430'); g.addColorStop(.5,'#e03040'); g.addColorStop(1,'#a01430');
-  ctx.beginPath(); ctx.save();
-  rr(x-w/2,y-h/2,w,h,[w/2,w/2,10,10]);
-  ctx.fillStyle=g; ctx.shadowColor='rgba(230,50,70,.5)'; ctx.shadowBlur=18; ctx.fill();
-  ctx.strokeStyle='rgba(255,215,0,.4)'; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.shadowBlur=0;
-  // ribbon bow
-  ctx.fillStyle='#ffd700';
+  // hard shadow
+  ctx.beginPath(); rr(x-w/2+4,y-h/2+5,w,h,[w/2,w/2,10,10]);
+  ctx.fillStyle=BBLK; ctx.fill();
+  // body — brand red flat
+  ctx.beginPath(); rr(x-w/2,y-h/2,w,h,[w/2,w/2,10,10]);
+  ctx.fillStyle=BR; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2; ctx.stroke();
+  // gold ribbon cross
+  ctx.fillStyle=BGOLD;
+  ctx.fillRect(x-3.5,y-h/2,7,h);
+  ctx.fillRect(x-w/2,y-5,w,10);
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1;
+  ctx.strokeRect(x-3.5,y-h/2,7,h);
+  ctx.strokeRect(x-w/2,y-5,w,10);
+  // bow
+  ctx.fillStyle=BGOLD;
   ctx.beginPath(); ctx.ellipse(x,y-h/2+9,12,7,0,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1.5; ctx.stroke();
   // shine
-  ctx.beginPath(); rr(x-w/2+5,y-h/2+5,w-10,h/3,[w/2-5,w/2-5,3,3]);
-  ctx.fillStyle='rgba(255,255,255,.12)'; ctx.fill();
-  ctx.restore();
+  ctx.beginPath(); rr(x-w/2+6,y-h/2+6,w-12,h/3,[w/2-6,w/2-6,3,3]);
+  ctx.fillStyle='rgba(255,255,255,.14)'; ctx.fill();
 }
 
-// ── HUD ───────────────────────────────────────────────────────
+// ── HUD — brand-styled tiles ───────────────────────────────
 function drawHUD() {
-  // level badge
-  ctx.font='bold 13px "IM Fell English",Georgia,serif';
-  ctx.fillStyle='rgba(255,215,0,.7)'; ctx.textAlign='left'; ctx.textBaseline='alphabetic';
-  ctx.fillText(`POZIOM ${levelNum+1}/6`, 14, VH-10);
-
-  // score
-  ctx.font='bold 20px "IM Fell English",Georgia,serif';
-  ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd70099'; ctx.shadowBlur=8;
-  if(catchTotal >= TARGET){
-    ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=14;
-    ctx.fillText(`✨ UPGRADE! +${upgradeCount}`, 14, 52);
+  // score tile
+  const isUp = catchTotal >= TARGET;
+  ctx.save();
+  ctx.beginPath(); rr(10,8,140,36,7);
+  ctx.fillStyle=isUp ? BGOLD : BBLK; ctx.fill();
+  ctx.strokeStyle=isUp ? BBLK : BGOLD; ctx.lineWidth=2; ctx.stroke();
+  ctx.font=`900 15px ${NUN}`; ctx.fillStyle=isUp?BBLK:'#FFFFFF';
+  ctx.textAlign='left'; ctx.textBaseline='middle';
+  if(isUp){
+    ctx.fillText(`✨ UPGRADE! +${upgradeCount}`, 20, 26);
   } else {
-    ctx.fillText(`🎁 ${catchTotal}`, 14, 52);
+    ctx.fillText(`🎁 ${catchTotal} / ${TARGET}`, 20, 26);
   }
-  ctx.shadowBlur=0;
+  ctx.restore();
 
-  // progress bar (tree fill)
-  const bw=140,bh=7,bx=14,by=58;
-  ctx.fillStyle='rgba(255,255,255,.15)';
-  ctx.beginPath(); rr(bx,by,bw,bh,4); ctx.fill();
+  // progress bar
+  const bw=140,bh=6,bx=10,by=48;
+  ctx.fillStyle='rgba(0,0,0,0.5)';
+  ctx.beginPath(); rr(bx,by,bw,bh,3); ctx.fill();
   const prog=Math.min(1,catchTotal/TARGET);
-  const pg=ctx.createLinearGradient(bx,0,bx+bw,0);
-  pg.addColorStop(0,'#ffd700'); pg.addColorStop(1,'#43c96f');
-  ctx.fillStyle=pg; ctx.shadowColor='#ffd70088'; ctx.shadowBlur=6;
-  ctx.beginPath(); rr(bx,by,bw*prog,bh,4); ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle=isUp?BGOLD:BR;
+  ctx.beginPath(); rr(bx,by,bw*prog,bh,3); ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1;
+  ctx.beginPath(); rr(bx,by,bw,bh,3); ctx.stroke();
 
-  // lives
-  ctx.font='22px serif'; ctx.textAlign='right'; ctx.textBaseline='alphabetic';
+  // lives tile
+  ctx.save();
+  ctx.beginPath(); rr(VW-90,8,80,36,7);
+  ctx.fillStyle=BR; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2; ctx.stroke();
+  ctx.font=`900 17px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#FFFFFF';
   let hstr='';
-  for(let i=0;i<3;i++) hstr += i<lives?'❤️':'🖤';
-  ctx.fillText(hstr,VW-12,52);
+  for(let i=0;i<3;i++) hstr += i<lives?'❤':'♡';
+  ctx.fillText(hstr,VW-50,26);
+  ctx.restore();
 
-  // song progress bar (thin, at very bottom)
+  // level badge
+  ctx.save();
+  ctx.beginPath(); rr(10,VH-28,100,22,6);
+  ctx.fillStyle=BG; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.font=`900 11px ${NUN}`; ctx.fillStyle='#FFFFFF';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(`POZIOM ${levelNum+1}/6`, 60, VH-17);
+  ctx.restore();
+
+  // song progress bar (brand red, bottom)
   if(musicGoing && music.duration) {
     const sp=music.currentTime/music.duration;
-    ctx.fillStyle='rgba(255,255,255,.08)'; ctx.fillRect(0,VH-4,VW,4);
-    ctx.fillStyle='rgba(255,215,0,.4)'; ctx.fillRect(0,VH-4,VW*sp,4);
+    ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(0,VH-3,VW,3);
+    ctx.fillStyle=BR; ctx.fillRect(0,VH-3,VW*sp,3);
   }
 }
 
-// ── sparkles ──────────────────────────────────────────────────
+// ── sparkles ──────────────────────────────────────────────
 function burst(x,y,color,n=14) {
   for(let i=0;i<n;i++){
     const a=(Math.PI*2/n)*i, sp=2+Math.random()*3.5;
@@ -725,13 +803,14 @@ function tickSparkles() {
   });
 }
 
-// ── confetti ──────────────────────────────────────────────────
+// ── confetti — brand colors ────────────────────────────────
+const CONF_COLORS = [BR, BG, BGOLD, '#FFFFFF', BR, BGL, BGOLD, '#FFFFFF'];
 function initConfetti() {
   confetti=Array.from({length:70},()=>({
     x:Math.random()*VW, y:-20-Math.random()*80,
     vx:(Math.random()-.5)*4, vy:2+Math.random()*2,
     r:4+Math.random()*6, rot:Math.random()*Math.PI*2, spin:(Math.random()-.5)*.2,
-    color:ORB_COLORS[Math.floor(Math.random()*ORB_COLORS.length)],
+    color:CONF_COLORS[Math.floor(Math.random()*CONF_COLORS.length)],
   }));
 }
 function tickConfetti() {
@@ -739,12 +818,14 @@ function tickConfetti() {
     c.x+=c.vx; c.y+=c.vy; c.rot+=c.spin;
     if(c.y>VH+20) c.y=-20;
     ctx.save(); ctx.translate(c.x,c.y); ctx.rotate(c.rot);
-    ctx.fillStyle=c.color; ctx.fillRect(-c.r/2,-c.r/4,c.r,c.r/2);
+    ctx.fillStyle=c.color;
+    // mix rectangles and squares
+    ctx.fillRect(-c.r/2,-c.r/4,c.r,c.r/2);
     ctx.restore();
   });
 }
 
-// ── stat reveal ────────────────────────────────────────────────
+// ── stat reveal — brand poster tile ───────────────────────
 function triggerStat(idx) {
   statCard={visible:true,idx,timer:0,phase:'in'};
 }
@@ -766,39 +847,53 @@ function tickStatCard() {
   }
 
   const s=STATS[statCard.idx];
+  const tileColor=STAT_TILE_COLORS[statCard.idx];
+  const isGold=(tileColor===BGOLD);
   const cx=VW/2, cy=VH*.48;
-  const w=320, h=180;
+  const w=330, h=195;
 
   ctx.save(); ctx.globalAlpha=Math.min(1,alpha);
 
-  // backdrop
-  ctx.beginPath(); rr(cx-w/2,cy-h/2,w,h,16);
-  ctx.fillStyle=`rgba(6,14,6,.92)`; ctx.fill();
-  ctx.strokeStyle=s.color; ctx.lineWidth=2;
-  ctx.shadowColor=s.color; ctx.shadowBlur=20; ctx.stroke(); ctx.shadowBlur=0;
+  // hard shadow (brand style)
+  ctx.beginPath(); rr(cx-w/2+5,cy-h/2+6,w,h,12);
+  ctx.fillStyle=BBLK; ctx.fill();
+
+  // main tile — flat brand color
+  ctx.beginPath(); rr(cx-w/2,cy-h/2,w,h,12);
+  ctx.fillStyle=tileColor; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2.5; ctx.stroke();
+
+  // white top accent strip
+  ctx.beginPath(); rr(cx-w/2,cy-h/2,w,52,[12,12,0,0]);
+  ctx.fillStyle='rgba(255,255,255,0.18)'; ctx.fill();
 
   // emoji
-  ctx.font='42px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(s.icon, cx, cy-h/2+44);
+  ctx.font='36px serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(s.icon, cx, cy-h/2+28);
 
-  // number
-  ctx.font=`bold 34px 'Cinzel Decorative',serif`;
-  ctx.fillStyle=s.color; ctx.shadowColor=s.color; ctx.shadowBlur=12;
+  // stat number — bold, white (or black on gold)
+  ctx.font=`900 38px ${NUN}`;
+  ctx.fillStyle=isGold?BBLK:'#FFFFFF';
   ctx.textBaseline='alphabetic';
-  ctx.fillText(s.num, cx, cy+8); ctx.shadowBlur=0;
+  ctx.shadowColor=isGold?'rgba(0,0,0,0.2)':'rgba(0,0,0,0.3)';
+  ctx.shadowBlur=6;
+  ctx.fillText(s.num, cx, cy+12); ctx.shadowBlur=0;
 
   // lines
-  ctx.font=`14px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(240,230,200,.9)';
-  ctx.fillText(s.line1, cx, cy+30);
-  ctx.fillText(s.line2, cx, cy+48);
+  ctx.font=`800 14px ${NUN}`;
+  ctx.fillStyle=isGold?'rgba(0,0,0,.75)':'rgba(255,255,255,.9)';
+  ctx.fillText(s.line1, cx, cy+34);
+  ctx.fillText(s.line2, cx, cy+54);
 
-  // progress dots
+  // progress dots (white with black border)
   const total=STATS.length, dotR=6, spacing=22;
   const startX=cx-(total-1)*spacing/2;
   for(let i=0;i<total;i++){
-    ctx.beginPath(); ctx.arc(startX+i*spacing,cy+h/2-18,dotR,0,Math.PI*2);
-    ctx.fillStyle=i<=statCard.idx?s.color:'rgba(255,255,255,.2)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(startX+i*spacing,cy+h/2-20,dotR,0,Math.PI*2);
+    ctx.fillStyle=i<=statCard.idx?'#FFFFFF':'rgba(255,255,255,.25)'; ctx.fill();
+    if(i<=statCard.idx){
+      ctx.strokeStyle=BBLK; ctx.lineWidth=1.5; ctx.stroke();
+    }
   }
 
   ctx.restore();
@@ -807,52 +902,91 @@ function tickStatCard() {
 // ══════════════════════════════════════════════════════════
 //  SCREENS
 // ══════════════════════════════════════════════════════════
-
-// ── start screen ──────────────────────────────────────────────
 const IMG_LOGO=new Image(); IMG_LOGO.src='ochoinka.png';
 
+// helper: brand card panel with red/green top bar
+function drawCard(px,py,pw,ph,topColor,topH=50,radius=14) {
+  // hard shadow
+  ctx.beginPath(); rr(px+5,py+6,pw,ph,radius);
+  ctx.fillStyle=BBLK; ctx.fill();
+  // card body
+  ctx.beginPath(); rr(px,py,pw,ph,radius);
+  ctx.fillStyle=BWHT; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2.5; ctx.stroke();
+  // top accent bar
+  ctx.beginPath(); rr(px,py,pw,topH,[radius,radius,0,0]);
+  ctx.fillStyle=topColor; ctx.fill();
+  ctx.strokeStyle=BBLK; ctx.lineWidth=2.5; ctx.stroke();
+}
+
+// ── start screen ──────────────────────────────────────────
 function drawStart() {
   drawBG(); drawSnow(); drawTree(false); drawLights();
 
-  // frosted card
-  ctx.fillStyle='rgba(4,10,25,.88)';
-  ctx.beginPath(); rr(28,VH*.38,VW-56,VH*.55,18); ctx.fill();
-  ctx.strokeStyle='rgba(255,215,0,.3)'; ctx.lineWidth=1.5; ctx.stroke();
+  const px=22, py=VH*.33, pw=VW-44, ph=VH*.57;
+  drawCard(px, py, pw, ph, BR, 56, 14);
 
-  // logo
+  // logo in red bar
   if(IMG_LOGO.complete&&IMG_LOGO.naturalWidth>0){
-    const lw=200, lh=Math.min(IMG_LOGO.naturalHeight/IMG_LOGO.naturalWidth*lw,80);
-    ctx.drawImage(IMG_LOGO,VW/2-lw/2,VH*.38+16,lw,lh);
+    const lh=44, lw=lh*(IMG_LOGO.naturalWidth/IMG_LOGO.naturalHeight);
+    ctx.drawImage(IMG_LOGO,VW/2-lw/2,py+6,lw,lh);
   } else {
-    ctx.font=`bold 30px 'Cinzel Decorative',serif`;
-    ctx.fillStyle='#ffd700'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-    ctx.shadowColor='#ffd700'; ctx.shadowBlur=18;
-    ctx.fillText('O Choinka!',VW/2,VH*.38+58); ctx.shadowBlur=0;
+    ctx.font=`900 20px ${NUN}`;
+    ctx.fillStyle='#FFFFFF'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('O CHOINKA! 🎄', VW/2, py+28);
   }
 
-  ctx.font=`italic 16px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(240,230,200,.9)'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  const ty=VH*.38+118;
-  ctx.fillText('Łap ozdoby i udekoruj choinkę',VW/2,ty);
-  ctx.fillText('dla dzieci z akcji O Choinka! 2025 🎄',VW/2,ty+24);
+  // campaign tagline (in red bar)
+  ctx.font=`900 13px ${NUN}`;
+  ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('POMOC ROŚNIE Z KAŻDYM DRZEWKIEM', VW/2, py+46);
 
-  ctx.font=`13px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(190,180,150,.75)';
-  ctx.fillText('Przesuń palec lub myszkę ← →',VW/2,ty+58);
-  ctx.fillText('Złap ozdoby zanim spadną!',VW/2,ty+78);
-  ctx.fillText(`6 poziomów  •  20 ozdób na choinkę  •  3 życia`,VW/2,ty+98);
+  // main title
+  const ty = py+76;
+  ctx.font=`900 28px ${NUN}`;
+  ctx.fillStyle=BR; ctx.textBaseline='alphabetic'; ctx.textAlign='center';
+  ctx.fillText('ŁAP OZDOBY!', VW/2, ty);
 
-  drawBtn(BTN.start,'🎄 ZAGRAJ!');
+  ctx.font=`900 13px ${NUN}`;
+  ctx.fillStyle=BG;
+  ctx.fillText('AKCJA O CHOINKA! 2025', VW/2, ty+20);
 
-  ctx.font=`11px Georgia,serif`; ctx.fillStyle='rgba(130,120,100,.5)';
-  ctx.fillText('Akcja O Choinka! 2025  •  Fundacja FDDS  •  800 100 100',VW/2,VH-16);
+  // instruction text
+  ctx.font=`800 14px ${NUN}`;
+  ctx.fillStyle='#333333';
+  ctx.fillText('Łap ozdoby i udekoruj choinkę', VW/2, ty+50);
+  ctx.fillText('dla dzieci z akcji O Choinka! 2025', VW/2, ty+70);
+
+  ctx.font=`800 12px ${NUN}`; ctx.fillStyle='#666';
+  ctx.fillText('← Przesuń palec lub myszkę →', VW/2, ty+100);
+  ctx.fillText('Złap ozdoby zanim spadną!', VW/2, ty+118);
+
+  // stats strip (3 tiles like poster)
+  const tiles=[{c:BR,t:'6 POZIOMÓW'},{c:BG,t:'20 OZDÓB'},{c:BGOLD,t:'3 ŻYCIA'}];
+  tiles.forEach((tile,i)=>{
+    const tw=90, th=34, tx=px+14+i*(tw+8), tty=ty+140;
+    ctx.beginPath(); rr(tx+2,tty+3,tw,th,6); ctx.fillStyle=BBLK; ctx.fill();
+    ctx.beginPath(); rr(tx,tty,tw,th,6);
+    ctx.fillStyle=tile.c; ctx.fill();
+    ctx.strokeStyle=BBLK; ctx.lineWidth=2; ctx.stroke();
+    ctx.font=`900 11px ${NUN}`;
+    ctx.fillStyle=tile.c===BGOLD?BBLK:'#FFFFFF';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(tile.t, tx+tw/2, tty+th/2);
+  });
+
+  drawBtn(BTN.start, '🎄 ZAGRAJ!');
+
+  ctx.font=`800 10px ${NUN}`; ctx.fillStyle='rgba(80,70,60,.55)';
+  ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Fundacja FDDS  •  800 100 100', VW/2, VH-14);
 }
 
-// ── game screen ───────────────────────────────────────────────
+// ── game screen ───────────────────────────────────────────
 function drawPlay() {
   drawBG(); drawSnow(); drawTree(false); drawLights();
 
-  // check song time for level transitions
+  // level transitions
   if(musicGoing && !statCard.visible) {
     const ct=music.currentTime;
     if(nextStatIdx < STATS.length && ct >= LEVEL_TIMES[nextStatIdx]) {
@@ -862,23 +996,23 @@ function drawPlay() {
     }
   }
 
-  // spawn — beat-driven + fallback timer
+  // spawn — beat-driven + fallback
   const cfg = LEVEL_CONFIG[Math.min(levelNum, LEVEL_CONFIG.length-1)];
   const beat = checkBeat();
   if (beat && orbs.length < cfg.maxOrbs) { spawnOrb(); fallbackSpawnTick = 0; }
   fallbackSpawnTick++;
-  if (fallbackSpawnTick > cfg.interval * 2) { spawnOrb(); fallbackSpawnTick = 0; } // safety net
+  if (fallbackSpawnTick > cfg.interval * 2) { spawnOrb(); fallbackSpawnTick = 0; }
 
-  // beat pulse overlay — subtle flash on kick
+  // beat pulse flash — brand red tint
   if (beatPulse > 0.01) {
-    ctx.fillStyle = `rgba(255,230,160,${beatPulse * 0.06})`;
+    ctx.fillStyle = `rgba(214,40,40,${beatPulse * 0.05})`;
     ctx.fillRect(0, 0, VW, VH);
   }
 
   // move player
   if(touchX !== null){
     const target = Math.max(PLR.w/2, Math.min(VW-PLR.w/2, touchX));
-    PLR.x += (target-PLR.x)*.22; // smooth follow
+    PLR.x += (target-PLR.x)*.22;
   } else {
     if(keys.left)  PLR.x=Math.max(PLR.w/2,    PLR.x-PLR.speed);
     if(keys.right) PLR.x=Math.min(VW-PLR.w/2, PLR.x+PLR.speed);
@@ -887,7 +1021,6 @@ function drawPlay() {
   // move & collide orbs
   const isUpgrade = catchTotal >= TARGET;
   orbs=orbs.filter(o=>{
-    // update trail for deluxe orbs
     if(o.type==='deluxe'){
       if(!o.trail) o.trail=[];
       o.trail.push({x:o.x, y:o.y});
@@ -899,10 +1032,8 @@ function drawPlay() {
     if(caught){
       burst(o.x,o.y,o.color, o.type==='deluxe'?20:14);
       if(!isUpgrade){
-        // normal: fill next tree slot
         if(catchTotal<TARGET){ const sl=SLOTS[catchTotal]; if(sl) sl.color=o.color; }
       } else {
-        // upgrade: replace a random non-upgraded slot (or any slot)
         const pool = SLOTS.filter(s=>s.color && !s.upgraded);
         const target = pool.length>0
           ? pool[Math.floor(Math.random()*pool.length)]
@@ -915,7 +1046,7 @@ function drawPlay() {
       return false;
     }
     if(o.y>VH+30){
-      if(!isUpgrade){ // only lose lives for non-upgrade orbs
+      if(!isUpgrade){
         lives--;
         if(lives<=0){
           if(catchTotal > highScore){
@@ -934,13 +1065,10 @@ function drawPlay() {
   orbs.forEach(drawOrb);
   tickSparkles();
 
-  // player bounces on beat
   if (beatPulse > 0) {
     const bounce = Math.sin(beatPulse * Math.PI) * 5;
-    ctx.save();
-    ctx.translate(0, -bounce);
-    drawPlayer();
-    ctx.restore();
+    ctx.save(); ctx.translate(0, -bounce);
+    drawPlayer(); ctx.restore();
   } else {
     drawPlayer();
   }
@@ -955,7 +1083,6 @@ function spawnOrb() {
   if(orbs.length >= maxOnScreen) return;
 
   if (isUpgrade) {
-    // deluxe upgrade orb — larger, sparkly, faster
     orbs.push({
       x: 30+Math.random()*(VW-60), y: -30,
       r: 22 + Math.random()*6,
@@ -977,83 +1104,67 @@ function spawnOrb() {
   }
 }
 
-// ── win screen ────────────────────────────────────────────────
+// ── win screen ────────────────────────────────────────────
 function drawWin() {
   drawBG(); drawSnow(); tickConfetti(); drawTree(true); drawLights(); tickSparkles();
 
-  // panel
-  ctx.fillStyle='rgba(4,12,4,.9)';
-  ctx.beginPath(); rr(28,VH*.55,VW-56,VH*.42,18); ctx.fill();
-  ctx.strokeStyle='#ffd700'; ctx.lineWidth=2;
-  ctx.shadowColor='#ffd700'; ctx.shadowBlur=15; ctx.stroke(); ctx.shadowBlur=0;
+  const px=22, py=VH*.5, pw=VW-44, ph=VH*.46;
+  drawCard(px, py, pw, ph, BG, 54, 14);
 
-  ctx.font=`bold 34px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='#ffd700'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.shadowColor='#ffd700'; ctx.shadowBlur=22;
-  ctx.fillText('🎉 Brawo!',VW/2,VH*.55+52); ctx.shadowBlur=0;
+  ctx.textAlign='center';
+  // green bar text
+  ctx.font=`900 22px ${NUN}`; ctx.fillStyle='#FFFFFF'; ctx.textBaseline='middle';
+  ctx.fillText('🎉 BRAWO!', VW/2, py+28);
 
-  ctx.font=`italic 16px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(240,230,200,.9)';
-  ctx.fillText('Choinka udekorowana!',VW/2,VH*.55+80);
+  ctx.font=`900 22px ${NUN}`; ctx.fillStyle=BG; ctx.textBaseline='alphabetic';
+  ctx.fillText('Choinka udekorowana!', VW/2, py+82);
 
-  ctx.font=`13px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(210,200,170,.82)';
-  ctx.fillText('Dzieci czekają na prawdziwe choinki.',VW/2,VH*.55+108);
-  ctx.fillText('Możesz pomóc — to się naprawdę stanie!',VW/2,VH*.55+128);
+  ctx.font=`800 13px ${NUN}`; ctx.fillStyle='#333';
+  ctx.fillText('Dzieci czekają na prawdziwe choinki.', VW/2, py+106);
+  ctx.fillText('Możesz pomóc — to się naprawdę stanie!', VW/2, py+124);
 
-  drawBtn(BTN.donate,'💛 Wesprzyj Akcję O Choinka!', true);
+  drawBtn(BTN.donate, '💛 Wesprzyj Akcję O Choinka!', true);
 
-  ctx.font=`italic 12px Georgia,serif`; ctx.fillStyle='rgba(150,140,120,.6)';
-  ctx.fillText('lub zagraj jeszcze raz ↩',VW/2,BTN.again.y+BTN.again.h/2);
+  ctx.font=`800 12px ${NUN}`; ctx.fillStyle='rgba(60,60,60,.65)';
+  ctx.textBaseline='middle';
+  ctx.fillText('lub zagraj jeszcze raz ↩', VW/2, BTN.again.y+BTN.again.h/2);
 }
 
-// ── lose screen ────────────────────────────────────────────────
+// ── lose screen ───────────────────────────────────────────
 function drawLose() {
   drawBG(); drawSnow(); drawTree(false); drawLights();
 
-  // card
-  const cy = VH*.33;
-  ctx.fillStyle='rgba(8,4,18,.92)';
-  ctx.beginPath(); rr(24,cy,VW-48,VH*.56,18); ctx.fill();
-  ctx.strokeStyle='rgba(200,140,0,.6)'; ctx.lineWidth=1.5; ctx.stroke();
-
-  // level badge
+  const px=20, py=VH*.26, pw=VW-40, ph=VH*.6;
   const lvlReached = Math.min(levelNum+1, NUM_LEVELS);
-  ctx.font=`bold 14px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(255,215,0,.6)'; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
-  ctx.fillText(`POZIOM ${lvlReached} z 6`, VW/2, cy+28);
+  drawCard(px, py, pw, ph, BR, 52, 14);
 
-  // headline
-  ctx.font=`bold 30px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd70077'; ctx.shadowBlur=14;
-  ctx.fillText(`Dotarłeś do`, VW/2, cy+64); ctx.shadowBlur=0;
-  ctx.font=`bold 38px 'Cinzel Decorative',serif`;
-  ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=18;
-  ctx.fillText(`Poziomu ${lvlReached}!`, VW/2, cy+106); ctx.shadowBlur=0;
+  ctx.textAlign='center';
+  // red bar text
+  ctx.font=`900 14px ${NUN}`; ctx.fillStyle='#FFFFFF'; ctx.textBaseline='middle';
+  ctx.fillText(`POZIOM ${lvlReached} z 6`, VW/2, py+26);
 
-  // ornament count
-  ctx.font=`italic 16px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(240,230,200,.88)';
-  ctx.fillText(`Złapałeś ${catchTotal} ozdób 🎁`, VW/2, cy+140);
+  ctx.font=`900 34px ${NUN}`; ctx.fillStyle=BR; ctx.textBaseline='alphabetic';
+  ctx.fillText(`Poziom ${lvlReached}!`, VW/2, py+94);
 
-  // record
+  ctx.font=`800 16px ${NUN}`; ctx.fillStyle=BBLK;
+  ctx.fillText(`Złapałeś ${catchTotal} ozdób 🎁`, VW/2, py+124);
+
   if(isNewRecord && catchTotal > 0){
-    ctx.font=`bold 15px 'IM Fell English',Georgia,serif`;
-    ctx.fillStyle='#ffd700'; ctx.shadowColor='#ffd700'; ctx.shadowBlur=10;
-    ctx.fillText(`🏆 Nowy rekord! ${catchTotal} ozdób`, VW/2, cy+172); ctx.shadowBlur=0;
+    // gold tile for record
+    ctx.beginPath(); rr(VW/2-120,py+134,240,32,6);
+    ctx.fillStyle=BGOLD; ctx.fill();
+    ctx.strokeStyle=BBLK; ctx.lineWidth=2; ctx.stroke();
+    ctx.font=`900 14px ${NUN}`; ctx.fillStyle=BBLK; ctx.textBaseline='middle';
+    ctx.fillText(`🏆 NOWY REKORD! ${catchTotal} ozdób`, VW/2, py+150);
   } else if(highScore > 0){
-    ctx.font=`13px 'IM Fell English',Georgia,serif`;
-    ctx.fillStyle='rgba(200,190,150,.7)';
-    ctx.fillText(`Twój rekord: ${highScore} ozdób`, VW/2, cy+172);
+    ctx.font=`800 13px ${NUN}`; ctx.fillStyle='#555'; ctx.textBaseline='alphabetic';
+    ctx.fillText(`Twój rekord: ${highScore} ozdób`, VW/2, py+158);
   }
 
-  // motivation
-  ctx.font=`13px 'IM Fell English',Georgia,serif`;
-  ctx.fillStyle='rgba(180,170,140,.75)';
-  ctx.fillText('Dzieci nadal czekają na choinki 💪', VW/2, cy+200);
-  ctx.fillText('Pobij rekord albo wesprzyj akcję!', VW/2, cy+220);
+  ctx.font=`800 13px ${NUN}`; ctx.fillStyle='#444'; ctx.textBaseline='alphabetic';
+  ctx.fillText('Dzieci nadal czekają na choinki 💪', VW/2, py+188);
+  ctx.fillText('Pobij rekord albo wesprzyj akcję!', VW/2, py+206);
 
-  // two buttons
   drawBtn(BTN.retry,   '🔄 Pobij rekord');
   drawBtn(BTN.donate2, '💛 Wesprzyj akcję', true);
 }
