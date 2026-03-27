@@ -231,42 +231,78 @@ function toVirtual(cx,cy) {
   return {x:(cx-r.left)*VW/r.width, y:(cy-r.top)*VH/r.height};
 }
 
-// ── LEADERBOARD ───────────────────────────────────────────
+// ── GLOBAL LEADERBOARD ────────────────────────────────────
+// To enable a global leaderboard visible to all players:
+//   1. Go to console.firebase.google.com → create project
+//   2. Build → Realtime Database → Create database (test mode)
+//   3. Copy the database URL (ends with .firebaseio.com) and paste below:
+const FIREBASE_URL = ''; // e.g. 'https://o-choinka-2026-default-rtdb.firebaseio.com'
+
 const LS_KEY = 'choinka_scores_2026';
-function getScores() {
+function getLocalScores() {
   try { return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); } catch(e) { return []; }
 }
-function saveScore(name,score) {
-  const s=getScores();
+function saveLocalScore(name,score) {
+  const s=getLocalScores();
   s.push({name:name.substring(0,12)||'ANONIMEK',score,date:new Date().toLocaleDateString('pl-PL')});
   s.sort((a,b)=>b.score-a.score); s.splice(10);
   localStorage.setItem(LS_KEY,JSON.stringify(s));
-  return s;
+}
+async function saveScore(name,score) {
+  saveLocalScore(name,score);
+  if(!FIREBASE_URL) return;
+  try {
+    await fetch(`${FIREBASE_URL}/scores.json`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:(name.substring(0,12)||'ANONIMEK').toUpperCase(),score,date:new Date().toLocaleDateString('pl-PL')})
+    });
+  } catch(e){}
 }
 function isTopScore(score) {
   if(score<=0) return false;
-  const s=getScores();
+  const s=getLocalScores();
   return s.length<10 || score>s[s.length-1].score;
 }
-function renderScoresHTML() {
-  const s=getScores();
+async function fetchGlobalScores() {
+  if(!FIREBASE_URL) return null;
+  try {
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch(`${FIREBASE_URL}/scores.json`,{signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return null;
+    const data=await r.json();
+    if(!data) return [];
+    const arr=Object.values(data).filter(e=>e&&e.name&&typeof e.score==='number');
+    arr.sort((a,b)=>b.score-a.score);
+    return arr.slice(0,10);
+  } catch(e){ return null; }
+}
+async function renderScoresHTML() {
   const list=document.getElementById('scoresList');
-  if(s.length===0){
+  const hdr=document.querySelector('.scores-header h2');
+  list.innerHTML='<p class="empty-scores">Ładowanie... ⏳</p>';
+  let scores=await fetchGlobalScores();
+  const isGlobal=scores!==null;
+  if(!scores) scores=getLocalScores();
+  if(hdr) hdr.textContent=isGlobal?'🌍 TOP 10 — GLOBALNY':'🏆 TOP 10 — LOKALNY';
+  if(scores.length===0){
     list.innerHTML='<p class="empty-scores">Brak wyników — zagraj jako pierwszy! 🎄</p>';
     return;
   }
   const medals=['🥇','🥈','🥉'];
   const cls=['gold','silver','bronze'];
-  list.innerHTML=s.map((e,i)=>`
+  list.innerHTML=scores.map((e,i)=>`
     <div class="score-row ${cls[i]||''}">
       <span class="score-rank">${medals[i]||`${i+1}.`}</span>
       <span class="score-name">${e.name}</span>
       <span class="score-pts">${e.score} 🎄</span>
     </div>`).join('');
 }
-function showScores() {
-  renderScoresHTML();
+async function showScores() {
   document.getElementById('scoresScreen').classList.add('on');
+  await renderScoresHTML();
 }
 
 // ── HTML OVERLAYS ─────────────────────────────────────────
@@ -296,11 +332,11 @@ function checkNameEntry() {
     setTimeout(()=>document.getElementById('nameInput').focus(),300);
   }
 }
-function submitName() {
+async function submitName() {
   const name=(document.getElementById('nameInput').value.trim().toUpperCase()||'ANONIMEK').substring(0,12);
-  saveScore(name,finalDisplayScore);
+  await saveScore(name,finalDisplayScore);
   document.getElementById('nameEntry').classList.remove('on');
-  showScores();
+  await showScores();
 }
 let finalDisplayScore=0;
 
@@ -447,13 +483,13 @@ canvas.addEventListener('click',e=>handleTap(toVirtual(e.clientX,e.clientY)));
 function inBox(p,b){return p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h;}
 
 const BTN={
-  start:       {x:60, y:558,w:300,h:58},
-  scoresLink:  {x:150,y:626,w:120,h:34},
+  start:       {x:60, y:420,w:300,h:58},
+  scoresLink:  {x:150,y:492,w:120,h:32},
   donate:      {x:60, y:532,w:300,h:58},
-  again:       {x:110,y:600,w:200,h:40},
-  retry:       {x:20, y:542,w:182,h:56},
-  donate2:     {x:218,y:542,w:182,h:56},
-  pause:       {x:VW-46,y:8,w:36,h:36},
+  again:       {x:110,y:606,w:200,h:40},
+  retry:       {x:20, y:440,w:182,h:56},
+  donate2:     {x:218,y:440,w:182,h:56},
+  pause:       {x:VW/2-18,y:8,w:36,h:36},
   pauseResume: {x:60, y:330,w:300,h:56},
   pauseQuit:   {x:60, y:402,w:300,h:56},
 };
@@ -948,7 +984,7 @@ const IMG_LOGO=new Image();IMG_LOGO.src='ochoinka.png';
 // ── SCREENS ───────────────────────────────────────────────
 function drawStart(){
   drawBG();drawSnow();drawTree(false);drawLights();
-  const px=22,py=VH*.33,pw=VW-44,ph=VH*.57;
+  const px=22,py=VH*.27,pw=VW-44,ph=VH*.59;
   drawCard(px,py,pw,ph,BR,56,14);
   // logo in header bar
   if(IMG_LOGO.complete&&IMG_LOGO.naturalWidth>0){
@@ -961,21 +997,17 @@ function drawStart(){
   ctx.font=`900 12px ${NUN}`;ctx.fillStyle='rgba(255,255,255,.88)';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText('POMOC ROŚNIE Z KAŻDYM DRZEWKIEM',VW/2,py+47);
 
-  const ty=py+76;
-  ctx.font=`900 28px ${NUN}`;ctx.fillStyle=BR;ctx.textBaseline='alphabetic';ctx.textAlign='center';
+  const ty=py+72;
+  ctx.font=`900 28px ${NUN}`;ctx.fillStyle=BBLK;ctx.textBaseline='alphabetic';ctx.textAlign='center';
   ctx.fillText('ŁAP OZDOBY!',VW/2,ty);
   ctx.font=`900 13px ${NUN}`;ctx.fillStyle=BG;ctx.fillText('AKCJA O CHOINKA! 2026',VW/2,ty+20);
-  ctx.font=`800 14px ${NUN}`;ctx.fillStyle='#333';
-  ctx.fillText('Łap ozdoby i udekoruj choinkę',VW/2,ty+50);
-  ctx.fillText('dla dzieci z akcji O Choinka! 2026',VW/2,ty+70);
-  ctx.font=`800 12px ${NUN}`;ctx.fillStyle='#666';
-  ctx.fillText('← Przesuń palec lub myszkę →',VW/2,ty+98);
-  ctx.fillText('Złap ozdoby zanim spadną!',VW/2,ty+116);
+  ctx.font=`800 13px ${NUN}`;ctx.fillStyle='#555';
+  ctx.fillText('Przesuń palec lub myszkę — złap ozdoby zanim spadną!',VW/2,ty+46);
 
   // stat tiles
   const tiles=[{c:BR,t:'6 POZIOMÓW'},{c:BG,t:'20 OZDÓB'},{c:BGOLD,t:'3 ŻYCIA'}];
   tiles.forEach((tile,i)=>{
-    const tw=90,th=34,tx=px+14+i*(tw+8),tty=ty+134;
+    const tw=90,th=34,tx=px+14+i*(tw+8),tty=ty+72;
     ctx.beginPath();rr(tx+2,tty+3,tw,th,6);ctx.fillStyle=BBLK;ctx.fill();
     ctx.beginPath();rr(tx,tty,tw,th,6);ctx.fillStyle=tile.c;ctx.fill();
     ctx.strokeStyle=BBLK;ctx.lineWidth=2;ctx.stroke();
@@ -1090,6 +1122,12 @@ function drawWin(){
   ctx.font=`800 13px ${NUN}`;ctx.fillStyle='#333';
   ctx.fillText('Dzieci czekają na prawdziwe choinki.',VW/2,py+106);
   ctx.fillText('Możesz pomóc — to się naprawdę stanie!',VW/2,py+124);
+  // score badge
+  const sc=catchTotal+(upgradeCount>0?Math.floor(upgradeCount/2):0);
+  ctx.beginPath();rr(VW/2-90,py+140,180,34,8);ctx.fillStyle=BGOLD;ctx.fill();
+  ctx.strokeStyle=BBLK;ctx.lineWidth=2;ctx.stroke();
+  ctx.font=`900 15px ${NUN}`;ctx.fillStyle=BBLK;ctx.textBaseline='middle';
+  ctx.fillText(`Twój wynik: ${sc} ozdób 🎄`,VW/2,py+157);
   drawBtn(BTN.donate,'💛 Wesprzyj Akcję O Choinka!',true);
   ctx.font=`800 12px ${NUN}`;ctx.fillStyle='rgba(60,60,60,.65)';ctx.textBaseline='middle';
   ctx.fillText('lub zagraj jeszcze raz ↩',VW/2,BTN.again.y+BTN.again.h/2);
